@@ -1,16 +1,12 @@
-# runner
+# RunnerTracker Application
 
-A new Flutter project.
+Flutter application to work on Anroid and IOS devices
 
-## Getting Started
+## Test Area
 
-This project is a starting point for a Flutter application.
+Android Emulator and Pyhsical IOS 14.6 device will be used to test the project.
 
-A few resources to get you started if this is your first Flutter project:
+## Important Notes Before Starting Application
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+-> Sqlite, firebase will be used to store the data. ( Except Login data, which only will be stored in sqlite)
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.

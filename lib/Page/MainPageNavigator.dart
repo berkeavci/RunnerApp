@@ -5,12 +5,12 @@ import 'loginpage.dart';
 
 // Execute future inside of () due to onPressed accepts only void
 
-class FirstPage extends StatefulWidget {
+class MainPageNavigator extends StatefulWidget {
   @override
-  _FirstPageState createState() => _FirstPageState();
+  _MainPageNavigator createState() => _MainPageNavigator();
 }
 
-class _FirstPageState extends State<FirstPage> {
+class _MainPageNavigator extends State<MainPageNavigator> {
   @override
   Widget build(BuildContext context) => Scaffold(
         body: StreamBuilder(

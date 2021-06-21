@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:runner/Page/firstpage.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:runner/Page/MainPageNavigator.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'LoginStates/google_signIn.dart';
 import 'package:provider/provider.dart';
+import 'constans.dart';
 
 Future main() async {
   WidgetsFlutterBinding
@@ -20,10 +22,10 @@ class RunnerTracker extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'Runner Tracker',
         theme: ThemeData(
-          primaryColor: Colors.red.shade400,
-          scaffoldBackgroundColor: Colors.white,
+          primaryColor: thePrimaryColor,
+          textTheme: GoogleFonts.robotoTextTheme(Theme.of(context).textTheme),
         ),
-        home: FirstPage(),
+        home: MainPageNavigator(),
       )); // Return widget - view
 
 }

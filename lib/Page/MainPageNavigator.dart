@@ -12,28 +12,31 @@ class MainPageNavigator extends StatefulWidget {
 
 class _MainPageNavigator extends State<MainPageNavigator> {
   @override
-  Widget build(BuildContext context) => Scaffold(
-        body: StreamBuilder(
-          stream: FirebaseAuth.instance.authStateChanges(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              print("State is done?");
-              return Container(
-                child: CircularProgressIndicator(
-                  // TODO: Not Working
-                  color: Colors.black,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
-                ),
-              );
-            } else if (snapshot.hasData)
-              return DashboardPage();
-            else if (snapshot.hasError) {
-              return Center(
-                child: Text("Unsuccessful Login Attempt!"),
-              );
-            } else
-              return LoginPage();
-          },
-        ),
-      );
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: StreamBuilder(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            print("State is done?");
+            return Container(
+              child: CircularProgressIndicator(
+                // TODO: Not Working
+                color: Colors.black,
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
+              ),
+            );
+          } else if (snapshot.hasData)
+            return DashboardPage();
+          else if (snapshot.hasError) {
+            return Center(
+              child: Text("Unsuccessful Login Attempt!"),
+            );
+          } else {
+            return LoginPage();
+          }
+        },
+      ),
+    );
+  }
 }

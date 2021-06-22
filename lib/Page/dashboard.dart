@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:runner/LoginStates/google_signIn.dart';
 
+// Application DashBoard Page
 class DashboardPage extends StatefulWidget {
   DashboardPage({Key? key}) : super(key: key);
 

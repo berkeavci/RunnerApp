@@ -1,10 +1,12 @@
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:runner/LoginStates/google_signIn.dart';
 import 'package:provider/provider.dart';
+import 'package:runner/LoginStates/sign_in_withoutGoogle.dart';
 import 'package:runner/components/inputEmail_TF.dart';
 import 'package:runner/components/inputPassword_TF.dart';
-import 'package:runner/components/input_container.dart';
+import 'package:flutter/foundation.dart';
 
 Widget _buildLoginBtn(BuildContext ct) {
   return Container(
@@ -25,6 +27,22 @@ Widget _buildLoginBtn(BuildContext ct) {
   );
 }
 
+Widget _buildSignInButton(
+    BuildContext ct,
+    TextEditingController emailController,
+    TextEditingController passwordController) {
+  return ElevatedButton.icon(
+    icon: FaIcon(FontAwesomeIcons.youtube),
+    onPressed: () {
+      print("Password Check: " + passwordController.text);
+      var providerR = Provider.of<AuthenticationService>(ct, listen: false);
+      providerR.signIn(
+          email: emailController.text, password: passwordController.text);
+    },
+    label: Text("asdasd"),
+  );
+}
+
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
 
@@ -33,6 +51,9 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -64,8 +85,15 @@ class _LoginPageState extends State<LoginPage> {
                       style:
                           TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                     ),
-                    InputEmailTF(),
-                    InputPasswordTF(),
+                    InputEmailTF(
+                      emailController: emailController,
+                    ),
+                    InputPasswordTF(
+                      passwordController: passwordController,
+                    ),
+                    _buildLoginBtn(context),
+                    _buildSignInButton(
+                        context, emailController, passwordController),
                   ],
                 ),
               ),

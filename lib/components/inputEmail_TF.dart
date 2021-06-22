@@ -4,12 +4,16 @@ import 'package:runner/components/input_container.dart';
 import '../constans.dart';
 
 class InputEmailTF extends StatelessWidget {
-  const InputEmailTF({Key? key}) : super(key: key);
+  const InputEmailTF({Key? key, required this.emailController})
+      : super(key: key);
+
+  final TextEditingController emailController;
 
   @override
   Widget build(BuildContext context) {
     return InputContainer(
       child: TextField(
+        controller: emailController,
         cursorColor: thePrimaryColor,
         decoration: InputDecoration(
           icon: Icon(

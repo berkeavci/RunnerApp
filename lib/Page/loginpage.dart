@@ -4,9 +4,9 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:runner/LoginStates/google_signIn.dart';
 import 'package:provider/provider.dart';
 import 'package:runner/LoginStates/sign_in_withoutGoogle.dart';
-import 'package:runner/components/inputEmail_TF.dart';
-import 'package:runner/components/inputPassword_TF.dart';
 import 'package:flutter/foundation.dart';
+import 'package:runner/components/loginpage_components/inputEmail_TF.dart';
+import 'package:runner/components/loginpage_components/inputPassword_TF.dart';
 
 Widget _buildLoginBtn(BuildContext ct) {
   return Container(

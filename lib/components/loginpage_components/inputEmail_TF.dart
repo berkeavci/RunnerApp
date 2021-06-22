@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:runner/components/input_container.dart';
-import '../constans.dart';
+import 'input_container.dart';
+import '../../constans.dart';
 
 class InputEmailTF extends StatelessWidget {
   const InputEmailTF({Key? key, required this.emailController})

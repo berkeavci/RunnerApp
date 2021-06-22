@@ -16,11 +16,8 @@ Android Emulator and Pyhsical IOS 14.6 device will be used to test the project.
 
 There are login options; Login via Gmail, login via existed account in the app database.
 
-- [ ]
-- [x]
-
-Login via Gmail:
-	&#x2611; User click the button and directed to Gmail account page ( LoginState ) 
-	- User select an existed account or login their gmail account 
-		->  Unsuccessful operation back to the homepage ( HomePageState )
-		->  Successful operation user directed to dashboardpage of application ( LoggedInState)  
+# Login via Gmail:
+* User click the button and directed to Gmail account page ( LoginState )  &#x2611; 
+* User select an existed account or login their gmail account 
+* Unsuccessful operation back to the homepage ( HomePageState )
+* Successful operation user directed to dashboardpage of application ( LoggedInState)  

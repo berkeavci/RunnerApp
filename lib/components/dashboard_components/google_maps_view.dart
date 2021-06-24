@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:runner/MapsAlgorithm/google_maps_controller.dart';
 
 // Constants
 
@@ -10,12 +12,15 @@ final CameraPosition _kLake = CameraPosition(
     tilt: 59.440717697143555,
     zoom: 19.151926040649414);
 
-final CameraPosition _kGooglePlex = CameraPosition(
-  target: LatLng(37.42796133580664, -122.085749655962),
-  zoom: 14.4746,
-);
-
-// Google Maps View
+Set<Marker> _createMarker() {
+  return {
+    // Marker(
+    //     markerId: MarkerId("marker_1"),
+    //     position: _kMapCenter,
+    //     infoWindow: InfoWindow(title: 'Marker 1'),
+    //     rotation: 90),
+  };
+}
 
 class GoogleMapsView extends StatefulWidget {
   GoogleMapsView({Key? key}) : super(key: key);
@@ -25,21 +30,30 @@ class GoogleMapsView extends StatefulWidget {
 }
 
 class _GoogleMapsViewState extends State<GoogleMapsView> {
+  double? zoomL = 10.0;
+
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(5.0),
-      height: 400,
-      width: 400,
-      child: GoogleMap(
-        mapType: MapType.hybrid,
-        initialCameraPosition: _kLake,
-        onMapCreated: (map) {
-          Future.delayed(Duration(seconds: 2), () {
-            map.animateCamera(CameraUpdate.newCameraPosition(_kGooglePlex));
-          });
-        },
+      margin: EdgeInsets.only(left: 10.0),
+      height: 450,
+      width: 380,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(10),
+        child: GoogleMap(
+          mapType: MapType.terrain,
+          initialCameraPosition:
+              CameraPosition(target: initialCameraposition, zoom: 10.0),
+          zoomGesturesEnabled: true,
+          onMapCreated: onMapCreated,
+          myLocationEnabled: true,
+          onCameraMove: onGeoChanged,
+        ),
       ),
     );
   }
 }
+
+//  Future.delayed(Duration(seconds: 2), () {
+//             map.animateCamera(CameraUpdate.newCameraPosition(_kGooglePlex));

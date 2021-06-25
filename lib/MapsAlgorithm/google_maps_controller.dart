@@ -90,6 +90,6 @@ listenMap() async {
   }).onDone(() => messageHandler(1));
 }
 
-// StopRequestin location
+// Stop Requesting location
 
 // Rewrite Here

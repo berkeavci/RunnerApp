@@ -31,9 +31,10 @@ dependencies:
 
   provider: ^5.0.0
 
-  cupertino_icons: ^1.0.2
-
+  #View based 
   font_awesome_flutter: ^9.1.0
+  avatar_view: ^1.0.0+4 
+  cupertino_icons: ^1.0.3
 
   #Google Dependencies
   google_sign_in: ^5.0.4

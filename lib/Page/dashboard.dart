@@ -23,27 +23,13 @@ class _DashboardPageState extends State<DashboardPage> {
   // static const TextStyle optionStyle =
   //     TextStyle(fontSize: 24, fontWeight: FontWeight.bold);
   static List<Widget> _widgetOptions = <Widget>[
+    UserProfile(), // GoogleMapsView()
     GoogleMapsView(),
-    GoogleMapsView(),
-    userProfile_Page(),
+    UserProfile(),
   ];
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(
-          title: Text(user?.email ?? "Error?!" + "has logged in!"),
-          centerTitle: true,
-          actions: [
-            TextButton(
-              onPressed: () {
-                var provider =
-                    Provider.of<GoogleSignInProvider>(context, listen: false);
-                provider.logout();
-              },
-              child: Text("Logout"),
-            )
-          ],
-        ),
         body: Container(
           alignment: Alignment.center,
           color: Colors.white,

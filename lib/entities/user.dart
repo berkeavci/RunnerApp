@@ -1,7 +1,16 @@
 class User {
-  String username;
-  int id;
-  String password;
+  final String email;
+  final String name;
+  final String image;
+  final String about;
+  final bool isDarkMode;
+  final int id;
 
-  User({required this.username, required this.id, required this.password});
+  const User(
+      {required this.name,
+      required this.email,
+      required this.image,
+      required this.about,
+      required this.isDarkMode,
+      required this.id});
 }

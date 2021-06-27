@@ -18,11 +18,10 @@ class _MainPageNavigator extends State<MainPageNavigator> {
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            print("State is done?");
             return Container(
               child: CircularProgressIndicator(
                 // TODO: Not Working
-                color: Colors.black,
+                color: Colors.blue,
                 valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
               ),
             );

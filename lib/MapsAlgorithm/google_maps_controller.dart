@@ -15,27 +15,18 @@ void onGeoChanged(CameraPosition position) {
   //getZoomLevel(position.zoom);
 }
 
-// double getZoomLevel(double zoom) {
-//   return zoomL;
-// }
-
 // When Map created, either give default value or change CameraPosition according to move.
 void onMapCreated(GoogleMapController cntr) {
   _controller = cntr; // get mapcontroller
   location.onLocationChanged.listen((l) {
-    _controller!.animateCamera(
+    _controller?.animateCamera(
       CameraUpdate.newCameraPosition(
         CameraPosition(
           target: LatLng(l.latitude ?? 0.59, l.longitude ?? 0.96),
         ),
       ),
     );
-    //print("${l.latitude}" + "${l.longitude}");
   });
-
-  //LocationData loc = getLoc();
-  //print(loc.toString());
-  //print("${loc.latitude} + ${loc.longitude}");
   location.toString();
 }
 

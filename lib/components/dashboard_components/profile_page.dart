@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:runner/LoginStates/google_signIn.dart';
 import 'package:runner/components/dashboard_components/profile_page/edit_area.dart';
 import 'package:runner/components/dashboard_components/profile_page/image_widget.dart';
+import 'package:theme_provider/theme_provider.dart';
 
 // Profile Page of User - View
 
@@ -26,7 +27,12 @@ class _UserProfileState extends State<UserProfile> {
           ?.unfocus(), // Close Keyboard on IOS
       child: Scaffold(
         appBar: AppBar(
-          leading: Icon(Icons.navigate_before_outlined),
+          leading: IconButton(
+            icon: Icon(icon),
+            onPressed: () {
+              ThemeProvider.controllerOf(context).nextTheme();
+            }, // TODO: darkMode change // default: white
+          ),
           elevation: 0,
           actions: [
             IconButton(

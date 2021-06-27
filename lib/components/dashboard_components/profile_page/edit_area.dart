@@ -25,9 +25,14 @@ class _EditProfileState extends State<EditProfile> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: Icon(
-          Icons.navigate_before_outlined,
-          color: Colors.black,
+        leading: IconButton(
+          icon: Icon(
+            Icons.navigate_before_outlined,
+            color: Colors.black,
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
         actions: [
           IconButton(
@@ -35,7 +40,8 @@ class _EditProfileState extends State<EditProfile> {
               CupertinoIcons.cloud_download,
               color: Colors.black,
             ),
-            onPressed: () {},
+            onPressed:
+                () {}, // TODO: Save button which inserts data to DB in any change.
           )
         ],
         title: Text(
@@ -72,7 +78,7 @@ Widget nameTF(
             children: [
               TextField(
                 controller: nameController
-                  ..text = userInformation!.displayName ?? "",
+                  ..text = userInformation?.displayName ?? "",
                 cursorColor: thePrimaryColor,
                 decoration: InputDecoration(
                     icon: Icon(CupertinoIcons.person_crop_rectangle,

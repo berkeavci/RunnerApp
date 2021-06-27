@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:runner/Page/MainPageNavigator.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:theme_provider/theme_provider.dart';
 import 'LoginStates/google_signIn.dart';
 import 'package:provider/provider.dart';
 import 'constans.dart';
@@ -18,21 +19,29 @@ Future main() async {
 }
 
 class RunnerTracker extends StatelessWidget {
-  Widget build(BuildContext context) => ChangeNotifierProvider(
-        create: (_) => GoogleSignInProvider(),
-        child: Provider<AuthenticationService>(
-          create: (_) => AuthenticationService(FirebaseAuth.instance),
-          child: MaterialApp(
-            debugShowCheckedModeBanner: false,
-            title: 'Runner Tracker',
-            theme: ThemeData(
-              primaryColor: thePrimaryColor,
-              textTheme:
-                  GoogleFonts.robotoTextTheme(Theme.of(context).textTheme),
+  Widget build(BuildContext context) {
+    return ThemeProvider(
+      themes: [
+        AppTheme.dark(),
+        AppTheme.light(),
+      ],
+      child: ThemeConsumer(
+        child: ChangeNotifierProvider(
+          create: (_) => GoogleSignInProvider(),
+          child: Provider<AuthenticationService>(
+            create: (_) => AuthenticationService(FirebaseAuth
+                .instance), //TODO: Divide this area with theme change
+            child: Builder(
+              builder: (context) => MaterialApp(
+                debugShowCheckedModeBanner: false,
+                title: 'Runner Tracker',
+                theme: ThemeProvider.themeOf(context).data,
+                home: MainPageNavigator(),
+              ),
             ),
-            home: MainPageNavigator(),
           ),
         ),
-      ); // Return widget - view
-
+      ),
+    );
+  } // Return widget - view
 }

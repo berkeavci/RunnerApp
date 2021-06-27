@@ -13,6 +13,7 @@ class ImageWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Stack(
+        alignment: Alignment.center,
         children: [
           ClipOval(
             child: Material(
@@ -33,7 +34,7 @@ class ImageWidget extends StatelessWidget {
                 padding: EdgeInsets.all(2),
                 child: Container(
                   padding: EdgeInsets.all(11),
-                  color: Colors.blue,
+                  color: Colors.red.shade200,
                   child: Material(
                     color: Colors.transparent,
                     child: InkWell(
@@ -48,7 +49,7 @@ class ImageWidget extends StatelessWidget {
                 ),
               ),
             ),
-          )
+          ),
         ],
       ),
     );

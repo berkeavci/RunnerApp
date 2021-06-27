@@ -21,3 +21,7 @@ There are login options; Login via Gmail, login via existed account in the app d
 * User select an existed account or login their gmail account 
 * Unsuccessful operation back to the homepage ( HomePageState )
 * Successful operation user directed to dashboardpage of application ( LoggedInState)  
+
+# Dashboard Page:
+- Dashboard Page seperated into three area; **Home**, **Run**, **Profile**   
+

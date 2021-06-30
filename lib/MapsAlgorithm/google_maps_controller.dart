@@ -1,37 +1,41 @@
+import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
+import 'package:runner/components/dashboard_components/google_maps_view.dart';
 
 // Initials
 
 // Declarations
 GoogleMapController? _controller;
-late LatLng initialCameraposition = LatLng(0.59, 0.96);
+LatLng? initialCameraposition;
 Location location = new Location();
 
-void onGeoChanged(CameraPosition position) {
-  print("position: " + position.target.toString());
-  print("zoom: " + position.zoom.toString());
-  //getZoomLevel(position.zoom);
-}
+// void onGeoChanged(CameraPosition position) {
+//   print("position: " + position.target.toString());
+//   print("zoom: " + position.zoom.toString());
+//   //getZoomLevel(position.zoom);
+// }
 
-// When Map created, either give default value or change CameraPosition according to move.
-void onMapCreated(GoogleMapController cntr) {
-  _controller = cntr; // get mapcontroller
-  location.onLocationChanged.listen((l) {
-    _controller?.animateCamera(
-      CameraUpdate.newCameraPosition(
-        CameraPosition(
-          target: LatLng(l.latitude ?? 0.59, l.longitude ?? 0.96),
-        ),
-      ),
-    );
-  });
-  location.toString();
-}
+// // When Map created, either give default value or change CameraPosition according to move.
+// Future<void> onMapCreated(GoogleMapController cntr, BuildContext ct) async {
+//   await createMarkerImageFromAsset(ct);
+//   _controller = cntr; // get mapcontroller
+//   location.onLocationChanged.listen((l) {
+//     print(" Inside of Conroller: ${l.latitude} and ${l.longitude}");
+//     // _controller?.animateCamera(
+//     //   CameraUpdate.newCameraPosition(
+//     //     CameraPosition(
+//     //       target: LatLng(l.latitude ?? 0.59, l.longitude ?? 0.96),
+//     //       zoom: 19,
+//     //     ),
+//     //   ),
+//     // );
+//   });
+// }
 
 // location getter / Location package
-getLoc() async {
+serviceReady() async {
   bool _serviceEnabled;
   PermissionStatus _permissionGranted;
 
@@ -50,9 +54,11 @@ getLoc() async {
       return;
     }
   }
+}
 
+Future<LocationData> getLoc() async {
   LocationData _locationData = await location.getLocation();
-  print("Hello?");
+  print("${_locationData.latitude} and ${_locationData.longitude}");
   return _locationData;
 }
 
@@ -63,10 +69,15 @@ void messageHandler(int state) {
 }
 
 setLoc() async {
-  LocationData loc = getLoc();
+  LocationData loc = await getLoc();
+  print("initialv1: $initialCameraposition");
   initialCameraposition = LatLng(loc.latitude ?? 0.56, loc.longitude ?? 0.96);
-  return initialCameraposition;
+  print("initialv2: $initialCameraposition");
 }
+
+// getMarker() async {
+
+// }
 
 listenMap() async {
   location.onLocationChanged.listen((LocationData currentLocationData) {
@@ -82,5 +93,4 @@ listenMap() async {
 }
 
 // Stop Requesting location
-
 // Rewrite Here

@@ -24,4 +24,3 @@ There are login options; Login via Gmail, login via existed account in the app d
 
 # Dashboard Page:
 - Dashboard Page seperated into three area; **Home**, **Run**, **Profile**   
-

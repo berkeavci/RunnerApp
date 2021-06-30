@@ -22,8 +22,8 @@ class RunnerTracker extends StatelessWidget {
   Widget build(BuildContext context) {
     return ThemeProvider(
       themes: [
-        AppTheme.dark(),
         AppTheme.light(),
+        AppTheme.dark(),
       ],
       child: ThemeConsumer(
         child: ChangeNotifierProvider(

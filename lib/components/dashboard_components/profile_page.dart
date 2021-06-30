@@ -19,9 +19,15 @@ class UserProfile extends StatefulWidget {
 }
 
 class _UserProfileState extends State<UserProfile> {
+  // var icon = (userInformation?.isAnonymous ?? false)
+  //     ? CupertinoIcons.moon_stars
+  //     : CupertinoIcons.moon_stars_fill;
+  // TODO: change userInformation.isAnonymous w/ UserPreference change
+
+  var icon = CupertinoIcons.moon_stars;
+
   @override
   Widget build(BuildContext context) {
-    var icon = CupertinoIcons.moon_stars; // Dark/Night mode change button
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus
           ?.unfocus(), // Close Keyboard on IOS
@@ -31,7 +37,7 @@ class _UserProfileState extends State<UserProfile> {
             icon: Icon(icon),
             onPressed: () {
               ThemeProvider.controllerOf(context).nextTheme();
-            }, // TODO: darkMode change // default: white
+            },
           ),
           elevation: 0,
           actions: [

@@ -30,8 +30,9 @@ class _DashboardPageState extends State<DashboardPage> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
+        backgroundColor: Colors.white,
         body: Container(
-          alignment: Alignment.center,
+          margin: EdgeInsets.all(20),
           color: Colors.white,
           child: _widgetOptions.elementAt(_selectedIndex),
         ),

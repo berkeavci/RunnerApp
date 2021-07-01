@@ -14,26 +14,15 @@ class DrawRunPage extends StatefulWidget {
 class _DrawRunPageState extends State<DrawRunPage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
+    return Container(
+      child: Column(
         children: [
-          SizedBox(
-            height: 150,
-          ),
           GoogleMapsView(),
           SizedBox(
             height: 100,
           ),
-          activityStartButton(context),
         ],
       ),
     );
   }
-}
-
-@override
-Widget activityStartButton(BuildContext context) {
-  return Column(
-    children: [],
-  );
 }

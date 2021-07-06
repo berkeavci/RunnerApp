@@ -32,14 +32,14 @@ Widget _buildSignInButton(
     TextEditingController emailController,
     TextEditingController passwordController) {
   return ElevatedButton.icon(
-    icon: FaIcon(FontAwesomeIcons.youtube),
+    icon: FaIcon(Icons.login),
     onPressed: () {
       print("Password Check: " + passwordController.text);
       var providerR = Provider.of<AuthenticationService>(ct, listen: false);
       providerR.signIn(
           email: emailController.text, password: passwordController.text);
     },
-    label: Text("asdasd"),
+    label: Text("Login"),
   );
 }
 

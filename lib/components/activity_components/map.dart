@@ -1,6 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:runner/activity_map_calculation/google_maps_controller.dart';
+import 'package:runner/activity_map_calculation/firebase_service.dart';
 import 'package:runner/components/dashboard_components/google_maps_view.dart';
 
 class DrawMap extends StatefulWidget {
@@ -12,6 +15,24 @@ class DrawMap extends StatefulWidget {
 }
 
 class _DrawMapState extends State<DrawMap> {
+  Set<Polyline> polyline = {};
+  bool isActivityStarted = true;
+  bool isPaused = false;
+  GoogleMapController? _controller;
+  double _destLatitude = 39.909178, _destLongitude = 32.8149566;
+
+  Map<PolylineId, Polyline> polylines = {};
+  List<LatLng> polylineCoordinates = [];
+  PolylinePoints? polylinePoints;
+  String googleAPiKey = "AIzaSyD-UTPnkQA4F1OWfq8wFWDneLHdpOs2j3o";
+
+  @override
+  void initState() {
+    super.initState();
+    polylinePoints = PolylinePoints();
+    _getPolyline();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,12 +42,14 @@ class _DrawMapState extends State<DrawMap> {
             mapType: MapType.normal,
             initialCameraPosition:
                 CameraPosition(target: widget.initialPosition, zoom: 20),
-            onMapCreated: (map) async {
-              await createMarkerImageFromAsset(context);
-              setState(() {});
-            },
+            onMapCreated: onMapCreated,
             markers: createMarker(),
             myLocationButtonEnabled: false,
+            tiltGesturesEnabled: true,
+            compassEnabled: true,
+            scrollGesturesEnabled: true,
+            zoomGesturesEnabled: true,
+            polylines: Set<Polyline>.of(polylines.values),
           ),
           Padding(
             padding: const EdgeInsets.all(30.0),
@@ -45,5 +68,60 @@ class _DrawMapState extends State<DrawMap> {
         ],
       ),
     );
+  }
+
+  void onMapCreated(GoogleMapController controller) async {
+    ApplicationState().getInitialLocation();
+    await createMarkerImageFromAsset(context);
+    _controller = controller;
+    location.onLocationChanged.listen((event) {
+      controller.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+            target: LatLng(event.latitude ?? 0.59, event.longitude ?? 0.96),
+            zoom: 19,
+          ),
+        ),
+      );
+      setLoc();
+      createMarker();
+      if (mounted) {
+        _getPolyline();
+      }
+    });
+  }
+
+  // Polyline addition to map
+  _addPolyLine() {
+    setState(() {
+      PolylineId id = PolylineId("poly");
+      Polyline polyline = Polyline(
+          polylineId: id, color: Colors.black, points: polylineCoordinates);
+      polylines[id] = polyline;
+    });
+  }
+
+  // getLoc().then((value) => widget.initialPosition.latitude = value.latitude)
+
+  Future<void> _getPolyline() async {
+    if (isActivityStarted && isPaused != false) {
+      PolylineResult result = await polylinePoints!.getRouteBetweenCoordinates(
+        googleAPiKey,
+        PointLatLng(
+            widget.initialPosition.latitude, widget.initialPosition.longitude),
+        PointLatLng(initialCameraposition?.latitude ?? 1,
+            initialCameraposition?.longitude ?? 1),
+        travelMode: TravelMode.walking,
+      );
+      //print(result.points.map((e) => LatLng(e.latitude, e.longitude)).toList());
+      if (result.status == 'OK') {
+        result.points.forEach((PointLatLng point) {
+          polylineCoordinates.add(LatLng(point.latitude, point.longitude));
+        });
+      } else {
+        print(result.status);
+      }
+      _addPolyLine();
+    }
   }
 }

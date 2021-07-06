@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:runner/MapsAlgorithm/google_maps_controller.dart';
+import 'package:runner/activity_map_calculation/google_maps_controller.dart';
 import 'package:runner/components/activity_components/map.dart';
 
 class ActivityPage extends StatefulWidget {
@@ -23,15 +23,30 @@ class _ActivityPageState extends State<ActivityPage> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => DrawMap(
-                        initialPosition: initialCameraposition ?? LatLng(0, 0),
-                      )),
+                builder: (context) => DrawMap(
+                  initialPosition: initialCameraposition ?? LatLng(0, 0),
+                ),
+              ),
             );
           } else if (details.delta.dx > 0) {
-            // Statistic Page
-
+            // Stats Page
+            ActivityScreen();
           }
         },
+      ),
+    );
+  }
+}
+
+class ActivityScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Column(
+        children: [
+          // KM, BPM, kalori
+          // Time
+        ],
       ),
     );
   }

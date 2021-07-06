@@ -1,11 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:runner/components/dashboard_components/dashboard_.dart';
 import 'package:runner/components/dashboard_components/google_maps_view.dart';
 import 'package:runner/components/dashboard_components/profile_page.dart';
-import 'package:runner/MapsAlgorithm/google_maps_controller.dart';
-import 'package:runner/components/dashboard_components/run_page/draw_run.dart';
 
 // Application DashBoard Page
 class DashboardPage extends StatefulWidget {
@@ -32,7 +28,6 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget build(BuildContext context) => Scaffold(
         backgroundColor: Colors.white,
         body: Container(
-          margin: EdgeInsets.all(20),
           color: Colors.white,
           child: _widgetOptions.elementAt(_selectedIndex),
         ),

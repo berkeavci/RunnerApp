@@ -39,6 +39,18 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>EnableBackgroundLocationUpdates</key>
+  	<true/>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>...</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>...</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>...</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
@@ -58,11 +70,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>...</string>
-	<key>NSLocationAlwaysUsageDescription</key>
-	<string>...</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>...</string>
 </dict>
 </plist>

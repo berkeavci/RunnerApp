@@ -2,10 +2,9 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:runner/MapsAlgorithm/firebase_service.dart';
-import 'package:runner/MapsAlgorithm/google_maps_controller.dart';
+import 'package:runner/activity_map_calculation/firebase_service.dart';
+import 'package:runner/activity_map_calculation/google_maps_controller.dart';
 import 'package:runner/Page/activity_page.dart';
-import 'package:runner/entities/location_info.dart';
 
 BitmapDescriptor? runnerIcon;
 
@@ -43,8 +42,9 @@ class _GoogleMapsViewState extends State<GoogleMapsView> {
                 if (snapshot.hasData) {
                   children = <Widget>[
                     Container(
+                      margin: EdgeInsets.only(left: 20),
                       height: 400,
-                      width: 400,
+                      width: 450,
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(10),
                         child: GoogleMap(
@@ -57,9 +57,7 @@ class _GoogleMapsViewState extends State<GoogleMapsView> {
                           onMapCreated: (map) async {
                             await createMarkerImageFromAsset(context);
                             setState(() {});
-                            location.onLocationChanged.listen((event) {
-                              // according to the event, listen
-                            });
+                            location.onLocationChanged.listen((event) {});
                           },
                           //onCameraMove: onGeoChanged,
                           markers: createMarker(),
@@ -89,6 +87,7 @@ class _GoogleMapsViewState extends State<GoogleMapsView> {
                           context,
                           MaterialPageRoute(
                             builder: (context) => ActivityPage(),
+                            //fullscreenDialog: true,
                           ),
                         );
                       },
@@ -175,7 +174,6 @@ Future<void> createMarkerImageFromAsset(BuildContext context) async {
       imageConf, './assets/images/runner_marker.png',
       mipmaps: false);
   runnerIcon = bitmap;
-  print(bitmap.toString());
 }
 
 Set<Marker> createMarker() {

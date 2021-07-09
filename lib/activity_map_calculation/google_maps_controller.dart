@@ -39,7 +39,7 @@ serviceReady() async {
 
 Future<LocationData> getLoc() async {
   LocationData _locationData = await location.getLocation();
-  print("${_locationData.latitude} and ${_locationData.longitude}");
+  //print("${_locationData.latitude} and ${_locationData.longitude}");
   return _locationData;
 }
 
@@ -51,9 +51,9 @@ void messageHandler(int state) {
 
 setLoc() async {
   LocationData loc = await getLoc();
-  print("initialv1: $initialCameraposition");
+  //print("initialv1: $initialCameraposition");
   initialCameraposition = LatLng(loc.latitude ?? 0.56, loc.longitude ?? 0.96);
-  print("initialv2: $initialCameraposition");
+  //print("initialv2: $initialCameraposition");
 }
 
 listenMap() async {

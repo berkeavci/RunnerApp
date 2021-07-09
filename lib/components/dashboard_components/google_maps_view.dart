@@ -17,6 +17,7 @@ class GoogleMapsView extends StatefulWidget {
 
 class _GoogleMapsViewState extends State<GoogleMapsView> {
   double? zoomL = 10.0;
+  GoogleMapController? _cont;
 
   final Future<LatLng?> _dynamicLocationLoad = Future<LatLng?>.delayed(
     const Duration(seconds: 2),
@@ -27,6 +28,12 @@ class _GoogleMapsViewState extends State<GoogleMapsView> {
   void initState() {
     super.initState();
     setLoc();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _cont?.dispose();
   }
 
   @override
@@ -55,6 +62,7 @@ class _GoogleMapsViewState extends State<GoogleMapsView> {
                           zoomGesturesEnabled: true,
                           zoomControlsEnabled: false,
                           onMapCreated: (map) async {
+                            _cont = map;
                             await createMarkerImageFromAsset(context);
                             setState(() {});
                             location.onLocationChanged.listen((event) {});
@@ -87,7 +95,7 @@ class _GoogleMapsViewState extends State<GoogleMapsView> {
                           context,
                           MaterialPageRoute(
                             builder: (context) => ActivityPage(),
-                            //fullscreenDialog: true,
+                            fullscreenDialog: true,
                           ),
                         );
                       },
@@ -137,6 +145,7 @@ class _GoogleMapsViewState extends State<GoogleMapsView> {
                           context,
                           MaterialPageRoute(
                             builder: (context) => ActivityPage(),
+                            fullscreenDialog: true,
                           ),
                         );
                       },

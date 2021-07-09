@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -15,29 +14,52 @@ class ApplicationState extends ChangeNotifier {
     // State here to track either google login or local login
     // Local login = email, name, password
     // When Start button clicked, we add initial latitude ad longitude to Firestore
-    return FirebaseFirestore.instance
-        .collection('Location')
-        .doc(firebaseUser?.uid)
-        .set({
+    return FirebaseFirestore.instance.collection('location').add({
       'name': FirebaseAuth.instance.currentUser?.displayName,
       'latitude': initialCameraposition.latitude,
       'longitude': initialCameraposition.longitude,
       'timestamp': DateTime.now().millisecondsSinceEpoch,
       'userId': FirebaseAuth.instance.currentUser?.uid,
-      'isActivity': 'true',
+      'isActivity': 'yes',
     });
   }
 
-  LatLng? getInitialLocation() {
+  Future<LatLng?> fetchInitialLocation() async {
+    LatLng? firstPos;
     try {
-      locList.doc(firebaseUser?.uid).get().then((value) {
-        print(value.data());
-      });
+      //   locList.get().then(
+      //         (value) => value.docs.forEach(
+      //           (element) {
+      //             firstPos =
+      //                 new LatLng(element["latitude"], element["longitude"]);
+      //           },
+      //         ),
+      //       );
+      await locList
+          .where("userId", isEqualTo: FirebaseAuth.instance.currentUser?.uid)
+          .orderBy("timestamp", descending: true)
+          .limit(1)
+          .get()
+          .then(
+            (value) => value.docs.forEach(
+              (element) {
+                //print(element.data());
+                firstPos =
+                    new LatLng(element["latitude"], element["longitude"]);
+              },
+            ),
+          );
+      return firstPos;
     } catch (e) {
       print(e.toString());
       return null;
     }
   }
+
+  // getInit() async {
+  //   LatLng? userInit = fetchInitialLocation();
+  //   return userInit;
+  // }
 }
 
 // .orderBy("timestamp", descending: true)
@@ -45,12 +67,19 @@ class ApplicationState extends ChangeNotifier {
 //           .docs
 
 // return FirebaseFirestore.instance
-//         .collection('location')
-//         .add({
+//         .collection('Location')
+//         .doc(firebaseUser?.uid)
+//         .set({
 //       'name': FirebaseAuth.instance.currentUser?.displayName,
 //       'latitude': initialCameraposition.latitude,
 //       'longitude': initialCameraposition.longitude,
 //       'timestamp': DateTime.now().millisecondsSinceEpoch,
 //       'userId': FirebaseAuth.instance.currentUser?.uid,
-//       'isActivity': 'yes',
-//     });
+//       'isActivity': 'true',
+//     }).then((value) => print("Hey"));
+
+// .then(
+//             (value) => value.docs.forEach((element) {
+//               print(element.data());
+//               firstPos = new LatLng(element["latitude"], element["longitude"]);
+//             }),

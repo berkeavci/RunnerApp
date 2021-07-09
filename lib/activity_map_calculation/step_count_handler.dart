@@ -7,7 +7,6 @@ class StepCountHandler {
 
 // StepCount
   String? onStepCount(StepCount event) {
-    print(event);
     _steps = event.steps.toString();
     print(_steps);
     return _steps;
@@ -18,6 +17,10 @@ class StepCountHandler {
     print(event);
     _status = event.status;
     print(_status);
+  }
+
+  String? getStep(String? getC) {
+    return getC;
   }
 
   void onPedestrianStatusError(error) {
@@ -33,17 +36,17 @@ class StepCountHandler {
     print(_stepCountStream);
   }
 
-  String? getStepCount() {
+  stepCountInitializers() {
     _pedestrianStatusStream = Pedometer.pedestrianStatusStream;
     _pedestrianStatusStream
         .listen(onPedestrianStatusChanged)
         .onError(onPedestrianStatusError);
+  }
 
-    _stepCountStream = Pedometer.stepCountStream;
-    _stepCountStream.listen((onStepCount) {
-      _steps = onStepCount.steps.toString();
-    });
-
-    return _steps;
+  int getLiveCount(int step1, int step2) {
+    int currentTotalSteps;
+    currentTotalSteps = step2 - step1;
+    print(currentTotalSteps);
+    return currentTotalSteps;
   }
 }

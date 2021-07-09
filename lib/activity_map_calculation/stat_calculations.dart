@@ -27,7 +27,7 @@ class Calculations {
   double getCalorie(double? speed, int second) {
     // 3.5 Speed = 6min/1km // meter/second
     double totalCalorieBurned = (second / 60) * (4 * 3.5 * 60) / 200;
-    print("$speed and $second");
+    //print("$speed and $second");
     return totalCalorieBurned;
   }
 }

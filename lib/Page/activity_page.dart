@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:pedometer/pedometer.dart';
 import 'package:runner/activity_map_calculation/firebase_service.dart';
 import 'package:runner/activity_map_calculation/google_maps_controller.dart';
 import 'package:runner/activity_map_calculation/stat_calculations.dart';
@@ -18,12 +20,14 @@ class ActivityPage extends StatefulWidget {
 }
 
 class _ActivityPageState extends State<ActivityPage> {
+  late Stream<StepCount> _stepCountStream;
+  List<int> stepsHolder = <int>[];
   LatLng? initpos;
   double km = 0;
   double calorie = 0;
   int second = 0;
   String? time;
-  String? stepCount;
+  int currentSteps = 0;
   //bool isGettingLocation = false;
 
   // Initial Location
@@ -43,7 +47,7 @@ class _ActivityPageState extends State<ActivityPage> {
   void initState() {
     super.initState();
     getStopWatch();
-    StepCountHandler().getStepCount();
+    StepCountHandler().stepCountInitializers();
   }
 
   @override
@@ -53,26 +57,25 @@ class _ActivityPageState extends State<ActivityPage> {
     // Safe Are Size below
     var padding = MediaQuery.of(context).padding;
     double newheight = height - padding.top - padding.bottom;
-    return Container(
-      width: width,
-      height: newheight,
-      color: Colors.yellow.shade400,
-      child: SafeArea(
-        child: GestureDetector(
-          onPanUpdate: (details) {
-            if (details.delta.dx < 0) {
-              // Swiped right
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => DrawMap(
-                    initialPosition: initpos ?? LatLng(0, 0),
-                  ),
-                ),
-              );
-              print("u swiped");
-            }
-          },
+    return GestureDetector(
+      onPanUpdate: (details) {
+        if (details.delta.dx < 0) {
+          // Swiped right
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => DrawMap(
+                initialPosition: initpos ?? LatLng(0, 0),
+              ),
+            ),
+          );
+        }
+      },
+      child: Container(
+        width: width,
+        height: newheight,
+        color: Colors.yellow.shade400,
+        child: SafeArea(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
@@ -82,7 +85,7 @@ class _ActivityPageState extends State<ActivityPage> {
               ),
               RunInfo(
                 km: km.toStringAsFixed(3),
-                time: time,
+                stepCount: currentSteps.toString(),
                 calorie: calorie.toStringAsFixed(1),
               ), // TODO:  RangeError (index): Invalid value: Only valid value is 0: -1
               DisplayTimer(time: time)
@@ -109,14 +112,13 @@ class _ActivityPageState extends State<ActivityPage> {
           new lt.LatLng(l[l.length - 2].latitude, l[l.length - 2].longitude),
           new lt.LatLng(event.latitude, event.longitude),
         );
-        //isGettingLocation = true;
+        getStepCount();
         // Calorie below
         calorie = Calculations().getCalorie(event.speed, second);
         // StepCount below
-        stepCount = StepCountHandler().getStepCount();
         setState(() {
           km += meter * 0.001;
-          print(calorie);
+          //print(calorie);
         });
       });
     } on PlatformException catch (e) {
@@ -131,6 +133,22 @@ class _ActivityPageState extends State<ActivityPage> {
       setState(() {
         second = sw.secondTime.value;
         time = StopWatchTimer.getDisplayTime(event, milliSecond: false);
+      });
+    });
+  }
+
+// StepCount Function
+  getStepCount() {
+    int stepCountHolder;
+    _stepCountStream = Pedometer.stepCountStream;
+    _stepCountStream.listen(StepCountHandler().onStepCount).onData((data) {
+      stepCountHolder = data.steps; // 5500
+      setState(() {
+        if (stepCountHolder != 0) {
+          stepsHolder.add(stepCountHolder);
+          currentSteps = StepCountHandler()
+              .getLiveCount(stepsHolder.first, stepsHolder.last);
+        }
       });
     });
   }
@@ -164,11 +182,14 @@ class DisplayTimer extends StatelessWidget {
 // Stats Area
 class RunInfo extends StatelessWidget {
   final String? km;
-  final String? time;
+  final String? stepCount;
   final String? calorie;
 
   const RunInfo(
-      {Key? key, required this.km, required this.time, required this.calorie})
+      {Key? key,
+      required this.km,
+      required this.stepCount,
+      required this.calorie})
       : super(key: key);
 
   @override
@@ -185,8 +206,14 @@ class RunInfo extends StatelessWidget {
                 padding: EdgeInsets.all(5),
                 child: Icon(Icons.location_on_outlined),
               ),
-              Icon(Icons.run_circle_outlined),
-              Icon(Icons.timelapse_rounded),
+              Icon(
+                FontAwesomeIcons.fire,
+                color: Colors.red.shade600,
+              ),
+              Icon(
+                Icons.run_circle_outlined,
+                color: Colors.green,
+              ),
             ],
           ),
           TableRow(children: <Widget>[
@@ -197,7 +224,7 @@ class RunInfo extends StatelessWidget {
               kmText: "$calorie",
             ),
             KmTF(
-              kmText: "$time",
+              kmText: "$stepCount",
             ),
           ]),
           TableRow(
@@ -220,7 +247,7 @@ class RunInfo extends StatelessWidget {
                 ),
               ),
               Text(
-                'Time',
+                'Step',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.white,
@@ -255,3 +282,4 @@ class KmTF extends StatelessWidget {
     );
   }
 }
+// TODO: Extension method

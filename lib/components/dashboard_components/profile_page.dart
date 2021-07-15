@@ -3,13 +3,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:runner/LoginStates/google_signIn.dart';
+import 'package:runner/activity_map_calculation/firebase_service.dart';
 import 'package:runner/components/dashboard_components/profile_page/edit_area.dart';
 import 'package:runner/components/dashboard_components/profile_page/image_widget.dart';
+import 'package:runner/entities/user.dart';
 import 'package:theme_provider/theme_provider.dart';
 
 // Profile Page of User - View
-
-var userInformation = FirebaseAuth.instance.currentUser;
 
 class UserProfile extends StatefulWidget {
   UserProfile({Key? key}) : super(key: key);
@@ -23,6 +23,19 @@ class _UserProfileState extends State<UserProfile> {
   //     ? CupertinoIcons.moon_stars
   //     : CupertinoIcons.moon_stars_fill;
   // TODO: change userInformation.isAnonymous w/ UserPreference change
+
+  UserInformations? userInformation;
+
+  _UserProfileState() {
+    ApplicationState().fetchUserInformation().then((value) => setState(() {
+          userInformation = value;
+        }));
+  }
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   var icon = CupertinoIcons.moon_stars;
 
@@ -45,7 +58,9 @@ class _UserProfileState extends State<UserProfile> {
               onPressed: () {
                 var provider =
                     Provider.of<GoogleSignInProvider>(context, listen: false);
-                provider.logout();
+                provider
+                    .logout()
+                    .onError((error, stackTrace) => print(error.toString()));
               },
               icon: Icon(Icons.logout),
             ),
@@ -71,11 +86,11 @@ class _UserProfileState extends State<UserProfile> {
             SizedBox(
               height: 30,
             ),
-            informationArea(),
+            informationArea(userInformation),
             SizedBox(
               height: 30,
             ),
-            buttonWidget(context),
+            buttonWidget(context, userInformation),
             SizedBox(
               height: 30,
             ),
@@ -88,10 +103,10 @@ class _UserProfileState extends State<UserProfile> {
 }
 
 //  Email + NameandSurname
-Widget informationArea() => Column(
+Widget informationArea(UserInformations? uI) => Column(
       children: [
         Text(
-          '${userInformation!.displayName}',
+          '${uI?.map["name"] ?? "Empty"}',
           textAlign: TextAlign.center,
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
         ),
@@ -99,33 +114,19 @@ Widget informationArea() => Column(
           height: 20,
         ),
         Text(
-          '${userInformation!.email}',
+          '${uI?.email ?? "Empty"}',
           textAlign: TextAlign.center,
           style: TextStyle(fontWeight: FontWeight.w300, color: Colors.grey),
         )
       ],
     );
 
-// Button MaterialState Color Transition
-// Color? getColor(Set<MaterialState> states) {
-//   const Set<MaterialState> interactiveStates = <MaterialState>{
-//     MaterialState.pressed,
-//     MaterialState.hovered,
-//     MaterialState.focused,
-//   };
-//   if (states.any((value) => interactiveStates.contains(value))) {
-//     return Colors.yellow;
-//   } else {
-//     return Colors.red;
-//   }
-// }
-
 // Edit Button
-Widget buttonWidget(BuildContext ct) => Column(
+Widget buttonWidget(BuildContext ct, UserInformations? ui) => Column(
       children: [
         ElevatedButton(
           style: ElevatedButton.styleFrom(
-            primary: Colors.red.shade100,
+            primary: Colors.red.shade300,
             elevation: 1,
           ),
           child: Row(
@@ -144,7 +145,8 @@ Widget buttonWidget(BuildContext ct) => Column(
           onPressed: () {
             Navigator.push(
               ct,
-              MaterialPageRoute(builder: (context) => EditProfile()),
+              MaterialPageRoute(
+                  builder: (context) => EditProfile(userInfo: ui)),
             );
           },
         ),

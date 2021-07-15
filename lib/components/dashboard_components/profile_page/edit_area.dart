@@ -2,11 +2,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:runner/components/dashboard_components/profile_page.dart';
 import 'package:runner/constans.dart';
+import 'package:runner/entities/user.dart';
 
 class EditProfile extends StatefulWidget {
-  EditProfile({Key? key}) : super(key: key);
+  final UserInformations? userInfo;
+
+  EditProfile({Key? key, required this.userInfo}) : super(key: key);
 
   @override
   _EditProfileState createState() => _EditProfileState();
@@ -18,8 +22,6 @@ class _EditProfileState extends State<EditProfile> {
   TextEditingController aboutController = new TextEditingController();
 
   // TODO:Handle Better User across Application
-
-  var userInformation = FirebaseAuth.instance.currentUser;
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +57,8 @@ class _EditProfileState extends State<EditProfile> {
           SizedBox(
             height: 15,
           ),
-          nameTF(nameController, cityController, aboutController),
+          nameTF(nameController, cityController, aboutController,
+              widget.userInfo?.name ?? "No Name"),
         ],
       ),
     );
@@ -66,8 +69,9 @@ class _EditProfileState extends State<EditProfile> {
 
 Widget nameTF(
         TextEditingController nameController,
-        TextEditingController cityController,
-        TextEditingController aboutController) =>
+        TextEditingController weightController,
+        TextEditingController aboutController,
+        String userInfo) =>
     Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -77,8 +81,7 @@ Widget nameTF(
           child: Column(
             children: [
               TextField(
-                controller: nameController
-                  ..text = userInformation?.displayName ?? "",
+                controller: nameController..text = userInfo,
                 cursorColor: thePrimaryColor,
                 decoration: InputDecoration(
                     icon: Icon(CupertinoIcons.person_crop_rectangle,
@@ -91,10 +94,10 @@ Widget nameTF(
                 height: 30,
               ),
               TextField(
-                controller: cityController,
+                controller: weightController,
                 cursorColor: thePrimaryColor,
                 decoration: InputDecoration(
-                    icon: Icon(Icons.flight_land, color: thePrimaryColor),
+                    icon: Icon(FontAwesomeIcons.fire, color: thePrimaryColor),
                     hintText: 'Your City'),
                 maxLines: null,
                 keyboardType: TextInputType.multiline,
@@ -103,7 +106,7 @@ Widget nameTF(
                 height: 30,
               ),
               TextField(
-                controller: cityController,
+                controller: aboutController,
                 cursorColor: thePrimaryColor,
                 decoration: InputDecoration(
                   icon:

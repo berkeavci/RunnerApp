@@ -75,35 +75,13 @@ class _GoogleMapsViewState extends State<GoogleMapsView> {
                     SizedBox(
                       height: 20,
                     ),
-                    ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        onSurface: Colors.white,
-                        shape: CircleBorder(),
-                        primary: Colors.white,
-                      ),
-                      icon: Image.asset(
-                        './assets/images/start_running.png',
-                        height: 100,
-                        width: 100,
-                        color: Colors.red,
-                      ),
-                      label: Text(''),
-                      onPressed: () async {
-                        await ApplicationState().addActivitytoDatabase(
-                            initialCameraposition ?? LatLng(0, 0));
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ActivityPage(),
-                            fullscreenDialog: true,
-                          ),
-                        );
-                      },
-                      // Record the
-                    ),
+                    ActivityStartButton(),
                   ];
                 } else {
                   children = <Widget>[
+                    SizedBox(
+                      width: 15,
+                    ),
                     SizedBox(
                       child: CircularProgressIndicator(
                         valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
@@ -124,33 +102,7 @@ class _GoogleMapsViewState extends State<GoogleMapsView> {
                     SizedBox(
                       height: 100,
                     ),
-                    ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        shape: CircleBorder(),
-                        primary: Colors.white,
-                        alignment: Alignment(0, 0),
-                      ),
-                      icon: Image.asset(
-                        './assets/images/start_running.png',
-                        height: 100,
-                        width: 100,
-                        color: Colors.red,
-                      ),
-                      label: Text(''),
-                      onPressed: () async {
-                        await ApplicationState().addActivitytoDatabase(
-                            initialCameraposition ?? LatLng(0, 0));
-                        ActivityPage();
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ActivityPage(),
-                            fullscreenDialog: true,
-                          ),
-                        );
-                      },
-                      // Record the
-                    ),
+                    ActivityStartButton(),
                   ];
                 }
                 return Container(
@@ -169,22 +121,63 @@ class _GoogleMapsViewState extends State<GoogleMapsView> {
       );
 }
 
-//  Future.delayed(Duration(seconds: 2), () {
-//             map.animateCamera(CameraUpdate.newCameraPosition(_kGooglePlex));
-// return Container(
-//         child: CircularProgressIndicator(
-//           color: Colors.black,
-//         ),
-//       );
+class ActivityStartButton extends StatelessWidget {
+  const ActivityStartButton({
+    Key? key,
+  }) : super(key: key);
 
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton.icon(
+      style: ElevatedButton.styleFrom(
+        shape: CircleBorder(),
+        primary: Colors.white,
+        alignment: Alignment(0, 0),
+      ),
+      icon: Image.asset(
+        './assets/images/start_running.png',
+        height: 100,
+        width: 100,
+        color: Colors.red.shade400,
+      ),
+      label: Text(''),
+      onPressed: () async {
+        await ApplicationState().addActivitytoDatabase(
+            initialCameraposition ?? LatLng(0, 0), "true");
+        _navigateAndDisplaySelection(context);
+        // Navigator.push(
+        //   context,
+        //   MaterialPageRoute(
+        //     builder: (context) => ActivityPage(),
+        //     fullscreenDialog: true,
+        //   ),
+        // );
+      },
+    );
+  }
+}
+
+// Navigation Area
+void _navigateAndDisplaySelection(BuildContext context) async {
+  final result = await Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => ActivityPage()),
+  );
+  ScaffoldMessenger.of(context)
+    ..removeCurrentSnackBar()
+    ..showSnackBar(SnackBar(content: Text('$result')));
+}
+
+// Custom Market
 Future<void> createMarkerImageFromAsset(BuildContext context) async {
   final ImageConfiguration imageConf = createLocalImageConfiguration(context);
   var bitmap = await BitmapDescriptor.fromAssetImage(
-      imageConf, './assets/images/runner_marker.png',
+      imageConf, './assets/images/runner_marker.bmp',
       mipmaps: false);
   runnerIcon = bitmap;
 }
 
+// Marker Creation
 Set<Marker> createMarker() {
   return {
     Marker(

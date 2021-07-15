@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
@@ -22,6 +21,7 @@ class _DrawMapState extends State<DrawMap> {
   bool isActivityStarted = true;
   bool isPaused = true;
   bool isMapPage = true;
+  bool isFirst = true;
   GoogleMapController? _controller;
 
   Map<PolylineId, Polyline> polylines = {};
@@ -106,9 +106,8 @@ class _DrawMapState extends State<DrawMap> {
             createMarker();
           }
           setLoc();
-
-          //print(mounted.toString());
           _getPolyline();
+          setState(() {});
         }
       },
     );
@@ -121,37 +120,47 @@ class _DrawMapState extends State<DrawMap> {
       setState(() {
         PolylineId id = PolylineId("poly");
         Polyline polyline = Polyline(
-            polylineId: id, color: Colors.black, points: polylineCoordinates);
+            width: 7,
+            visible: true,
+            polylineId: id,
+            color: Colors.black,
+            points: polylineCoordinates);
         polylines[id] = polyline;
       });
     }
   }
 
-  // getLoc().then((value) => widget.initialPosition.latitude = value.latitude)
-
   Future<void> _getPolyline() async {
-    if (isActivityStarted && isPaused) {
-      PolylineResult result = await polylinePoints!.getRouteBetweenCoordinates(
+    PolylineResult result;
+    if (isFirst) {
+      result = await polylinePoints!.getRouteBetweenCoordinates(
         googleAPiKey,
         PointLatLng(
             widget.initialPosition.latitude, widget.initialPosition.longitude),
         PointLatLng(initialCameraposition?.latitude ?? 1,
             initialCameraposition?.longitude ?? 1),
+        travelMode: TravelMode.walking,
       );
-      //print(result.points.map((e) => LatLng(e.latitude, e.longitude)).toList());
-      // print(
-      //     "${widget.initialPosition.latitude} ALSO MY FRIEND ${widget.initialPosition.longitude}");
-      // print(
-      //     "${initialCameraposition?.latitude} DYNAIOC? ${initialCameraposition?.longitude}");
-      if (result.status == 'OK') {
-        result.points.forEach((PointLatLng point) {
-          polylineCoordinates.add(LatLng(point.latitude, point.longitude));
-        });
-      } else {
-        print(result.status);
-      }
-      _addPolyLine();
+    } else {
+      result = await polylinePoints!.getRouteBetweenCoordinates(
+        googleAPiKey,
+        PointLatLng(
+            polylineCoordinates[polylineCoordinates.length - 1].latitude,
+            polylineCoordinates[polylineCoordinates.length - 1].longitude),
+        PointLatLng(initialCameraposition?.latitude ?? 1,
+            initialCameraposition?.longitude ?? 1),
+      );
     }
+    polylineCoordinates.clear();
+    if (result.status == 'OK') {
+      result.points.forEach((PointLatLng point) {
+        polylineCoordinates.add(LatLng(point.latitude, point.longitude));
+      });
+      print("Second Add");
+    } else {
+      print("Second Mistake");
+    }
+    _addPolyLine();
   }
 
   bool isDistanceEnough() {

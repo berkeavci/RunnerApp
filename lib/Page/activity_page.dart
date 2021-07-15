@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:isolate';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -20,19 +23,21 @@ class ActivityPage extends StatefulWidget {
 }
 
 class _ActivityPageState extends State<ActivityPage> {
-  late Stream<StepCount> _stepCountStream;
+  late Stream<StepCount> stepCountStream;
+  StreamSubscription? stepStream;
   List<int> stepsHolder = <int>[];
   LatLng? initpos;
   double km = 0;
-  double calorie = 0;
+  double kcal = 0;
   int second = 0;
   String? time;
   int currentSteps = 0;
+  double avgSpeed = 0.0;
   //bool isGettingLocation = false;
 
   // Initial Location
   _ActivityPageState() {
-    ApplicationState().fetchInitialLocation().then(
+    ApplicationState().fetchActivityLocationHolder().then(
           (value) => setState(
             () {
               initpos = value;
@@ -48,6 +53,12 @@ class _ActivityPageState extends State<ActivityPage> {
     super.initState();
     getStopWatch();
     StepCountHandler().stepCountInitializers();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    stepStream?.cancel();
   }
 
   @override
@@ -86,9 +97,36 @@ class _ActivityPageState extends State<ActivityPage> {
               RunInfo(
                 km: km.toStringAsFixed(3),
                 stepCount: currentSteps.toString(),
-                calorie: calorie.toStringAsFixed(1),
+                kcal: kcal.toStringAsFixed(1),
               ), // TODO:  RangeError (index): Invalid value: Only valid value is 0: -1
-              DisplayTimer(time: time)
+              DisplayTimer(time: time),
+              ElevatedButton(
+                onPressed: () async {
+                  // Add stats to class
+                  ApplicationState()
+                      .addActivityStatstoDatabase(
+                          kcal, currentSteps, km, avgSpeed, time ?? "0")
+                      .then(
+                        (value) => print("Database Operations Started"),
+                      );
+                  await ApplicationState().addActivitytoDatabase(
+                      initialCameraposition ?? LatLng(0, 0), "no");
+                  stepStream?.cancel();
+                  Navigator.pop(context,
+                      "Please Navigate History to check your last activity information!");
+                },
+                child: Icon(
+                  Icons.stop,
+                  color: Colors.white,
+                  size: 40,
+                ),
+                style: ElevatedButton.styleFrom(
+                  shape: CircleBorder(),
+                  padding: EdgeInsets.all(20),
+                  primary: Colors.black87, // <-- Button color
+                  onPrimary: Colors.yellow, // <-- Splash color
+                ),
+              )
             ],
           ),
         ),
@@ -103,24 +141,30 @@ class _ActivityPageState extends State<ActivityPage> {
   getKm() async {
     try {
       List<LatLng> l = <LatLng>[];
-      location.onLocationChanged.listen((event) {
-        //print(event.speed);
-        Calculations method = new Calculations();
-        // KM below
-        l.add(new LatLng(event.latitude ?? 0.0, event.longitude ?? 0.0));
-        double meter = method.getDistance(
-          new lt.LatLng(l[l.length - 2].latitude, l[l.length - 2].longitude),
-          new lt.LatLng(event.latitude, event.longitude),
-        );
-        getStepCount();
-        // Calorie below
-        calorie = Calculations().getCalorie(event.speed, second);
-        // StepCount below
-        setState(() {
-          km += meter * 0.001;
-          //print(calorie);
+      if (mounted) {
+        location.onLocationChanged.listen((event) {
+          //print(event.speed);
+          Calculations method = new Calculations();
+          // KM below
+          l.add(new LatLng(event.latitude ?? 0.0, event.longitude ?? 0.0));
+          double meter = method.getDistance(
+            new lt.LatLng(l[l.length - 2].latitude, l[l.length - 2].longitude),
+            new lt.LatLng(event.latitude, event.longitude),
+          );
+          avgSpeed += event.speed ?? 0.0;
+          getStepCount();
+          // Calorie below
+          kcal = Calculations().getCalorie(event.speed, second);
+          // StepCount below
+          print(event);
+          if (mounted) {
+            setState(() {
+              km += meter * 0.001;
+              print(kcal);
+            });
+          }
         });
-      });
+      }
     } on PlatformException catch (e) {
       print(e.toString());
     }
@@ -130,27 +174,35 @@ class _ActivityPageState extends State<ActivityPage> {
   getStopWatch() {
     StopWatchTimer sw = Calculations().getTimer();
     sw.rawTime.listen((event) {
-      setState(() {
-        second = sw.secondTime.value;
-        time = StopWatchTimer.getDisplayTime(event, milliSecond: false);
-      });
+      if (mounted) {
+        setState(() {
+          //print(event.toString());
+          second = sw.secondTime.value;
+          time = StopWatchTimer.getDisplayTime(event, milliSecond: false);
+        });
+      }
     });
   }
 
 // StepCount Function
   getStepCount() {
     int stepCountHolder;
-    _stepCountStream = Pedometer.stepCountStream;
-    _stepCountStream.listen(StepCountHandler().onStepCount).onData((data) {
-      stepCountHolder = data.steps; // 5500
-      setState(() {
-        if (stepCountHolder != 0) {
-          stepsHolder.add(stepCountHolder);
-          currentSteps = StepCountHandler()
-              .getLiveCount(stepsHolder.first, stepsHolder.last);
+    stepCountStream = Pedometer.stepCountStream;
+    stepStream = stepCountStream.listen(StepCountHandler().onStepCount)
+      ..onData((data) {
+        stepCountHolder = data.steps; // 5500
+        print("Call?");
+        if (mounted) {
+          setState(() {
+            // Track step differences to display instance of activity steps.
+            if (stepCountHolder != 0) {
+              stepsHolder.add(stepCountHolder);
+              currentSteps = StepCountHandler()
+                  .getLiveCount(stepsHolder.first, stepsHolder.last);
+            }
+          });
         }
       });
-    });
   }
 }
 
@@ -166,7 +218,7 @@ class DisplayTimer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      heightFactor: 6,
+      heightFactor: 5,
       child: Text(
         time ?? "",
         textAlign: TextAlign.center,
@@ -183,13 +235,10 @@ class DisplayTimer extends StatelessWidget {
 class RunInfo extends StatelessWidget {
   final String? km;
   final String? stepCount;
-  final String? calorie;
+  final String? kcal;
 
   const RunInfo(
-      {Key? key,
-      required this.km,
-      required this.stepCount,
-      required this.calorie})
+      {Key? key, required this.km, required this.stepCount, required this.kcal})
       : super(key: key);
 
   @override
@@ -217,13 +266,13 @@ class RunInfo extends StatelessWidget {
             ],
           ),
           TableRow(children: <Widget>[
-            KmTF(
+            DataTFs(
               kmText: "$km",
             ),
-            KmTF(
-              kmText: "$calorie",
+            DataTFs(
+              kmText: "$kcal",
             ),
-            KmTF(
+            DataTFs(
               kmText: "$stepCount",
             ),
           ]),
@@ -240,7 +289,7 @@ class RunInfo extends StatelessWidget {
                 ),
               ),
               Text(
-                'Calorie',
+                'Kcal',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.white,
@@ -261,8 +310,8 @@ class RunInfo extends StatelessWidget {
   }
 }
 
-class KmTF extends StatelessWidget {
-  const KmTF({
+class DataTFs extends StatelessWidget {
+  const DataTFs({
     Key? key,
     required this.kmText,
   }) : super(key: key);

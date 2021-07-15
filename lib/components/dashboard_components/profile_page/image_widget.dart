@@ -31,10 +31,10 @@ class ImageWidget extends StatelessWidget {
             right: 4,
             child: ClipOval(
               child: Container(
-                padding: EdgeInsets.all(2),
+                padding: EdgeInsets.all(0.5),
                 child: Container(
-                  padding: EdgeInsets.all(11),
-                  color: Colors.red.shade200,
+                  padding: EdgeInsets.all(10),
+                  color: Colors.red.shade300,
                   child: Material(
                     color: Colors.transparent,
                     child: InkWell(

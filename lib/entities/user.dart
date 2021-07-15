@@ -1,16 +1,19 @@
-class User {
-  final String email;
-  final String name;
-  final String image;
-  final String about;
-  final bool isDarkMode;
-  final int id;
+class UserInformations {
+  String email;
+  String name;
+  String about;
+  String uId;
+  int weight;
 
-  const User(
-      {required this.name,
-      required this.email,
-      required this.image,
-      required this.about,
-      required this.isDarkMode,
-      required this.id});
+  UserInformations(this.weight, this.name, this.email, this.about, this.uId);
+
+  Map<String, dynamic> get map {
+    return {
+      "email": email,
+      "name": name,
+      "about": about,
+      "uId": uId,
+      "weight": weight,
+    };
+  }
 }

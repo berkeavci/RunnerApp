@@ -11,6 +11,7 @@ class AuthenticationService {
       print("pas: " + password + "email: " + email);
       await _firebaseAuth.signInWithEmailAndPassword(
           email: email, password: password);
+      print(_firebaseAuth.currentUser?.uid);
       return 'Signed in';
     } on FirebaseAuthException catch (e) {
       return e.message;
@@ -22,9 +23,15 @@ class AuthenticationService {
     try {
       await _firebaseAuth.createUserWithEmailAndPassword(
           email: email, password: password);
+      print("Successfull!");
       return 'Signed Up';
     } on FirebaseAuthException catch (e) {
+      print(e.message);
       return e.message;
     }
+  }
+
+  Future logoutUser() async {
+    _firebaseAuth.signOut();
   }
 }

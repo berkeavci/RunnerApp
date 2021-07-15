@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:runner/Page/activity_history_page.dart';
 import 'package:runner/components/dashboard_components/google_maps_view.dart';
 import 'package:runner/components/dashboard_components/profile_page.dart';
 
@@ -14,12 +15,11 @@ class DashboardPage extends StatefulWidget {
 class _DashboardPageState extends State<DashboardPage> {
   var user = FirebaseAuth.instance.currentUser;
 
-  // Constants
   int _selectedIndex = 0;
   // static const TextStyle optionStyle =
   //     TextStyle(fontSize: 24, fontWeight: FontWeight.bold);
   static List<Widget> _widgetOptions = <Widget>[
-    GoogleMapsView(), // GoogleMapsView()
+    ActivityHistoryPage(),
     GoogleMapsView(),
     UserProfile(),
   ];
@@ -42,10 +42,12 @@ class _DashboardPageState extends State<DashboardPage> {
           items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(
               icon: Icon(Icons.history),
-              label: 'Home',
+              label: 'History',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.run_circle_outlined),
+              icon: Icon(
+                Icons.run_circle_outlined,
+              ),
               label: 'Run!',
             ),
             BottomNavigationBarItem(
@@ -54,7 +56,7 @@ class _DashboardPageState extends State<DashboardPage> {
             ),
           ],
           currentIndex: _selectedIndex,
-          selectedItemColor: Colors.red,
+          selectedItemColor: Colors.red.shade400,
           onTap: (index) {
             setState(() {
               _selectedIndex = index;

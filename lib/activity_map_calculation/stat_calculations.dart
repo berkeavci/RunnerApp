@@ -1,7 +1,6 @@
 // ignore: import_of_legacy_library_into_null_safe
 import 'package:latlong/latlong.dart' as lt;
 import 'package:stop_watch_timer/stop_watch_timer.dart';
-import 'package:pedometer/pedometer.dart';
 
 class Calculations {
   /// KM Calculation

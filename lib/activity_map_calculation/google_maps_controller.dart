@@ -5,7 +5,6 @@ import 'package:location/location.dart';
 // Initials
 
 // Declarations
-GoogleMapController? _controller;
 LatLng? initialCameraposition;
 Location location = new Location();
 

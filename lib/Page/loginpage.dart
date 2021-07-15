@@ -5,13 +5,16 @@ import 'package:runner/LoginStates/google_signIn.dart';
 import 'package:provider/provider.dart';
 import 'package:runner/LoginStates/sign_in_withoutGoogle.dart';
 import 'package:flutter/foundation.dart';
+import 'package:runner/Page/create_account_page.dart';
 import 'package:runner/components/loginpage/inputEmail_TF.dart';
 import 'package:runner/components/loginpage/inputPassword_TF.dart';
+
+import '../constans.dart';
 
 Widget _buildLoginBtn(BuildContext ct) {
   return Container(
     padding: EdgeInsets.symmetric(vertical: 25.0),
-    width: double.infinity,
+    width: 350,
     child: ElevatedButton.icon(
       style: ElevatedButton.styleFrom(
           primary: Colors.white,
@@ -31,15 +34,64 @@ Widget _buildSignInButton(
     BuildContext ct,
     TextEditingController emailController,
     TextEditingController passwordController) {
-  return ElevatedButton.icon(
-    icon: FaIcon(Icons.login),
+  return Container(
+    width: 350,
+    child: ElevatedButton.icon(
+      style: ElevatedButton.styleFrom(
+          primary: Colors.white, minimumSize: Size(50, 50)),
+      icon: FaIcon(
+        Icons.login,
+        color: Colors.red,
+      ),
+      onPressed: () {
+        var providerR = Provider.of<AuthenticationService>(ct, listen: false);
+        providerR
+            .signIn(
+                email: emailController.text, password: passwordController.text)
+            .then(
+          (value) {
+            if (value != 'Signed Up') {
+              ScaffoldMessenger.of(ct)
+                ..removeCurrentSnackBar()
+                ..showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      '${value.toString()}',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontFamily: productSans,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ),
+                );
+            }
+          },
+        );
+      },
+      label: Text(
+        "Login",
+        style: TextStyle(color: Colors.red),
+      ),
+    ),
+  );
+}
+
+@override
+Widget _buildCreateAccountButton(BuildContext context) {
+  return TextButton(
+    child: Text(
+      "Create an account",
+      style: TextStyle(color: Colors.red),
+    ),
     onPressed: () {
-      print("Password Check: " + passwordController.text);
-      var providerR = Provider.of<AuthenticationService>(ct, listen: false);
-      providerR.signIn(
-          email: emailController.text, password: passwordController.text);
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => CreateAnAccountPage(),
+        ),
+      );
     },
-    label: Text("Login"),
   );
 }
 
@@ -56,6 +108,8 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
     return Scaffold(
       body: Stack(
         children: [
@@ -63,8 +117,8 @@ class _LoginPageState extends State<LoginPage> {
             alignment: Alignment.center,
             child: SingleChildScrollView(
               child: Container(
-                width: 500,
-                height: 500,
+                width: width,
+                height: height,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -91,9 +145,13 @@ class _LoginPageState extends State<LoginPage> {
                     InputPasswordTF(
                       passwordController: passwordController,
                     ),
-                    _buildLoginBtn(context),
+                    SizedBox(
+                      height: 10,
+                    ),
                     _buildSignInButton(
                         context, emailController, passwordController),
+                    _buildLoginBtn(context),
+                    _buildCreateAccountButton(context),
                   ],
                 ),
               ),

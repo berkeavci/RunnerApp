@@ -31,4 +31,8 @@ class ActivityStats {
   static String toDay(DateTime dt) {
     return DateFormat('EEEE').format(dt).toString();
   }
+
+  static String toDate(DateTime dt) {
+    return DateFormat('M/d/y').format(dt).toString();
+  }
 }

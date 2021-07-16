@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:runner/Page/share_test.dart';
 import 'package:runner/constans.dart';
 import 'package:runner/entities/activity_stats.dart';
 
@@ -95,7 +94,37 @@ class _DetailsPageState extends State<DetailsPage> {
                           TextWidget(
                               text: "${widget.activityStats?.map["kcal"]}"),
                         ],
-                      )
+                      ),
+                      TableRow(
+                        children: <Widget>[
+                          TextWidget(text: "Time"),
+                          TextWidget(
+                              text: "${widget.activityStats?.map["time"]}"),
+                        ],
+                      ),
+                      TableRow(
+                        children: <Widget>[
+                          TextWidget(text: "Date"),
+                          TextWidget(
+                              text:
+                                  "${ActivityStats.toDate(widget.activityStats?.map["date"])}"),
+                        ],
+                      ),
+                      TableRow(
+                        children: <Widget>[
+                          TextWidget(text: "Average Speed"),
+                          TextWidget(
+                              text:
+                                  "${widget.activityStats?.map["averagespeed"]}"),
+                        ],
+                      ),
+                      TableRow(
+                        children: <Widget>[
+                          TextWidget(text: "Step"),
+                          TextWidget(
+                              text: "${widget.activityStats?.map["step"]}"),
+                        ],
+                      ),
                     ],
                   ),
                 )

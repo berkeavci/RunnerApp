@@ -6,8 +6,6 @@ import 'package:runner/activity_map_calculation/firebase_service.dart';
 import 'package:runner/activity_map_calculation/google_maps_controller.dart';
 import 'package:runner/Page/activity_page.dart';
 
-BitmapDescriptor? runnerIcon;
-
 class GoogleMapsView extends StatefulWidget {
   GoogleMapsView({Key? key}) : super(key: key);
 
@@ -18,6 +16,7 @@ class GoogleMapsView extends StatefulWidget {
 class _GoogleMapsViewState extends State<GoogleMapsView> {
   double? zoomL = 10.0;
   GoogleMapController? _cont;
+  BitmapDescriptor? runnerIcon;
 
   final Future<LatLng?> _dynamicLocationLoad = Future<LatLng?>.delayed(
     const Duration(seconds: 2),
@@ -49,9 +48,9 @@ class _GoogleMapsViewState extends State<GoogleMapsView> {
                 if (snapshot.hasData) {
                   children = <Widget>[
                     Container(
-                      margin: EdgeInsets.only(left: 20),
+                      margin: EdgeInsets.only(left: 15),
                       height: 400,
-                      width: 450,
+                      width: 470,
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(10),
                         child: GoogleMap(
@@ -63,12 +62,16 @@ class _GoogleMapsViewState extends State<GoogleMapsView> {
                           zoomControlsEnabled: false,
                           onMapCreated: (map) async {
                             _cont = map;
-                            await createMarkerImageFromAsset(context);
-                            setState(() {});
+                            setState(() {
+                              createMarkerImageFromAsset(context).then((value) {
+                                runnerIcon = value;
+                              });
+                            });
                             location.onLocationChanged.listen((event) {});
                           },
                           //onCameraMove: onGeoChanged,
-                          markers: createMarker(),
+                          markers: createMarker(
+                              runnerIcon ?? BitmapDescriptor.defaultMarker),
                         ),
                       ),
                     ),
@@ -100,14 +103,14 @@ class _GoogleMapsViewState extends State<GoogleMapsView> {
                       ),
                     ),
                     SizedBox(
-                      height: 100,
+                      height: 50,
                     ),
                     ActivityStartButton(),
                   ];
                 }
                 return Container(
-                  height: 900,
-                  width: 380,
+                  height: 700,
+                  width: 400,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -169,22 +172,23 @@ void _navigateAndDisplaySelection(BuildContext context) async {
 }
 
 // Custom Market
-Future<void> createMarkerImageFromAsset(BuildContext context) async {
+Future<BitmapDescriptor> createMarkerImageFromAsset(BuildContext context) {
   final ImageConfiguration imageConf = createLocalImageConfiguration(context);
-  var bitmap = await BitmapDescriptor.fromAssetImage(
-      imageConf, './assets/images/runner_marker.bmp',
-      mipmaps: false);
-  runnerIcon = bitmap;
+  return BitmapDescriptor.fromAssetImage(
+    imageConf,
+    'assets/images/runner_marker.bmp',
+    mipmaps: false,
+  );
 }
 
 // Marker Creation
-Set<Marker> createMarker() {
+Set<Marker> createMarker(BitmapDescriptor bitmap) {
   return {
     Marker(
       markerId: MarkerId("marker_1"),
       position: initialCameraposition ?? LatLng(0, 0),
       infoWindow: InfoWindow(title: 'Runner'),
-      icon: runnerIcon ?? BitmapDescriptor.defaultMarker,
+      icon: bitmap,
     ),
   }.toSet();
 }

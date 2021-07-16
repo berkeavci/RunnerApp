@@ -17,12 +17,14 @@ class DrawMap extends StatefulWidget {
 }
 
 class _DrawMapState extends State<DrawMap> {
+  List<LatLng> pointsLatLng = <LatLng>[];
   Set<Polyline> polyline = {};
   bool isActivityStarted = true;
   bool isPaused = true;
   bool isMapPage = true;
   bool isFirst = true;
   GoogleMapController? _controller;
+  BitmapDescriptor? runnerIcon;
 
   Map<PolylineId, Polyline> polylines = {};
   List<LatLng> polylineCoordinates = [];
@@ -53,7 +55,8 @@ class _DrawMapState extends State<DrawMap> {
               initialCameraPosition:
                   CameraPosition(target: widget.initialPosition, zoom: 17),
               onMapCreated: onMapCreated,
-              markers: createMarker(),
+              markers:
+                  createMarker(runnerIcon ?? BitmapDescriptor.defaultMarker),
               myLocationButtonEnabled: false,
               tiltGesturesEnabled: true,
               compassEnabled: true,
@@ -88,9 +91,9 @@ class _DrawMapState extends State<DrawMap> {
   }
 
   void onMapCreated(GoogleMapController controller) async {
-    await createMarkerImageFromAsset(context);
+    runnerIcon = await createMarkerImageFromAsset(context);
     _controller = controller;
-    await location.changeSettings(interval: 3000, distanceFilter: 10);
+    await location.changeSettings(interval: 1000, distanceFilter: 3);
     location.onLocationChanged.listen(
       (event) {
         if (mounted) {
@@ -103,7 +106,7 @@ class _DrawMapState extends State<DrawMap> {
             ),
           );
           if (isDistanceEnough()) {
-            createMarker();
+            createMarker(runnerIcon ?? BitmapDescriptor.defaultMarker);
           }
           setLoc();
           _getPolyline();
@@ -115,15 +118,15 @@ class _DrawMapState extends State<DrawMap> {
 
   // Polyline addition to map
   _addPolyLine() {
-    if (mounted && isDistanceEnough()) {
+    if (mounted) {
       //print(mounted.toString());
       setState(() {
         PolylineId id = PolylineId("poly");
         Polyline polyline = Polyline(
-            width: 7,
+            width: 3,
             visible: true,
             polylineId: id,
-            color: Colors.black,
+            color: Colors.red.withOpacity(0.5),
             points: polylineCoordinates);
         polylines[id] = polyline;
       });
@@ -133,12 +136,16 @@ class _DrawMapState extends State<DrawMap> {
   Future<void> _getPolyline() async {
     PolylineResult result;
     if (isFirst) {
+      isFirst = false;
+      pointsLatLng.add(LatLng(
+          widget.initialPosition.latitude, widget.initialPosition.longitude));
+      pointsLatLng.add(LatLng(initialCameraposition?.latitude ?? 1,
+          initialCameraposition?.longitude ?? 1));
+
       result = await polylinePoints!.getRouteBetweenCoordinates(
         googleAPiKey,
-        PointLatLng(
-            widget.initialPosition.latitude, widget.initialPosition.longitude),
-        PointLatLng(initialCameraposition?.latitude ?? 1,
-            initialCameraposition?.longitude ?? 1),
+        PointLatLng(pointsLatLng[0].latitude, pointsLatLng[0].longitude),
+        PointLatLng(pointsLatLng.last.latitude, pointsLatLng.last.longitude),
         travelMode: TravelMode.walking,
       );
     } else {
@@ -151,7 +158,7 @@ class _DrawMapState extends State<DrawMap> {
             initialCameraposition?.longitude ?? 1),
       );
     }
-    polylineCoordinates.clear();
+
     if (result.status == 'OK') {
       result.points.forEach((PointLatLng point) {
         polylineCoordinates.add(LatLng(point.latitude, point.longitude));

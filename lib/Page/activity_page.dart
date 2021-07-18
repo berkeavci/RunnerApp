@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:isolate';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -26,22 +24,20 @@ class _ActivityPageState extends State<ActivityPage> {
   late Stream<StepCount> stepCountStream;
   StreamSubscription? stepStream;
   List<int> stepsHolder = <int>[];
-  LatLng? initpos;
   double km = 0;
   double kcal = 0;
   int second = 0;
   String? time;
   int currentSteps = 0;
   double avgSpeed = 0.0;
-  //bool isGettingLocation = false;
+  List<LatLng> coordinates = [];
 
   // Initial Location
   _ActivityPageState() {
     ApplicationState().fetchActivityLocationHolder().then(
           (value) => setState(
             () {
-              initpos = value;
-              //isGettingLocation = true;
+              coordinates.add(value ?? LatLng(0, 0));
               getKm();
             },
           ),
@@ -76,7 +72,7 @@ class _ActivityPageState extends State<ActivityPage> {
             context,
             MaterialPageRoute(
               builder: (context) => DrawMap(
-                initialPosition: initpos ?? LatLng(0, 0),
+                coordinates: coordinates,
               ),
             ),
           );
@@ -103,14 +99,12 @@ class _ActivityPageState extends State<ActivityPage> {
               ElevatedButton(
                 onPressed: () async {
                   // Add stats to class
-                  ApplicationState()
-                      .addActivityStatstoDatabase(
-                          kcal, currentSteps, km, avgSpeed, time ?? "0")
-                      .then(
-                        (value) => print("Database Operations Started"),
-                      );
+                  ApplicationState().addActivityStatstoDatabase(kcal,
+                      currentSteps, km, avgSpeed, time ?? "0", coordinates);
+                  ApplicationState().updateLeaderboard(km);
                   await ApplicationState().addActivitytoDatabase(
                       initialCameraposition ?? LatLng(0, 0), "no");
+
                   stepStream?.cancel();
                   Navigator.pop(context,
                       "Please Navigate History to check your last activity information!");
@@ -143,7 +137,6 @@ class _ActivityPageState extends State<ActivityPage> {
       List<LatLng> l = <LatLng>[];
       if (mounted) {
         location.onLocationChanged.listen((event) {
-          //print(event.speed);
           Calculations method = new Calculations();
           // KM below
           l.add(new LatLng(event.latitude ?? 0.0, event.longitude ?? 0.0));
@@ -156,11 +149,9 @@ class _ActivityPageState extends State<ActivityPage> {
           // Calorie below
           kcal = Calculations().getCalorie(event.speed, second);
           // StepCount below
-          print(event);
           if (mounted) {
             setState(() {
               km += meter * 0.001;
-              print(kcal);
             });
           }
         });
@@ -176,7 +167,6 @@ class _ActivityPageState extends State<ActivityPage> {
     sw.rawTime.listen((event) {
       if (mounted) {
         setState(() {
-          //print(event.toString());
           second = sw.secondTime.value;
           time = StopWatchTimer.getDisplayTime(event, milliSecond: false);
         });
@@ -191,7 +181,6 @@ class _ActivityPageState extends State<ActivityPage> {
     stepStream = stepCountStream.listen(StepCountHandler().onStepCount)
       ..onData((data) {
         stepCountHolder = data.steps; // 5500
-        print("Call?");
         if (mounted) {
           setState(() {
             // Track step differences to display instance of activity steps.

@@ -1,7 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:runner/components/dashboard_components/google_maps_view.dart';
 import 'package:runner/constans.dart';
 import 'package:runner/entities/activity_stats.dart';
+import 'package:share_plus/share_plus.dart';
 
 class DetailsPage extends StatefulWidget {
   final ActivityStats? activityStats;
@@ -12,6 +15,16 @@ class DetailsPage extends StatefulWidget {
 }
 
 class _DetailsPageState extends State<DetailsPage> {
+  BitmapDescriptor? runnerIcon;
+  Set<Polyline> polyline = {};
+  Map<PolylineId, Polyline> polylines = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _addPolyLine();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,7 +42,12 @@ class _DetailsPageState extends State<DetailsPage> {
         actions: [
           IconButton(
             onPressed: () {
-              //MyApp();
+              // TODO: Improve Share Button
+              final RenderBox box = context.findRenderObject() as RenderBox;
+              Share.share("${widget.activityStats?.map["km"]}",
+                  subject: "${widget.activityStats?.map["step"]}",
+                  sharePositionOrigin:
+                      box.localToGlobal(Offset.zero) & box.size);
             },
             icon: Icon(Icons.share),
           )
@@ -127,6 +145,27 @@ class _DetailsPageState extends State<DetailsPage> {
                       ),
                     ],
                   ),
+                ),
+                Container(
+                  width: 350,
+                  height: 350,
+                  child: GoogleMap(
+                    mapType: MapType.normal,
+                    initialCameraPosition: CameraPosition(
+                        target: ActivityStats.stringtoLatLng(
+                                widget.activityStats?.map["coordinate"])
+                            .first,
+                        zoom: 15),
+                    onMapCreated: (map) {},
+                    markers: createMarker(
+                        runnerIcon ?? BitmapDescriptor.defaultMarker),
+                    myLocationButtonEnabled: false,
+                    tiltGesturesEnabled: true,
+                    compassEnabled: true,
+                    scrollGesturesEnabled: true,
+                    zoomGesturesEnabled: true,
+                    polylines: Set<Polyline>.of(polylines.values),
+                  ),
                 )
               ],
             ),
@@ -134,6 +173,37 @@ class _DetailsPageState extends State<DetailsPage> {
         ),
       ),
     );
+  }
+
+  _addPolyLine() {
+    if (mounted) {
+      //print(mounted.toString());
+      setState(() {
+        PolylineId id = PolylineId("poly");
+        Polyline polyline = Polyline(
+            width: 3,
+            visible: true,
+            polylineId: id,
+            color: Colors.red.withOpacity(0.5),
+            points: ActivityStats.stringtoLatLng(
+                widget.activityStats?.map["coordinate"]));
+        polylines[id] = polyline;
+      });
+    }
+  }
+
+  // TODO: Add Between markes here
+  Set<Marker> createMarkerActivityStats() {
+    return {
+      Marker(
+        markerId: MarkerId("marker_1"),
+        position: ActivityStats.stringtoLatLng(
+                widget.activityStats?.map["coordinate"])
+            .first,
+        infoWindow: InfoWindow(title: 'Runner'),
+        icon: BitmapDescriptor.defaultMarker,
+      ),
+    }.toSet();
   }
 }
 

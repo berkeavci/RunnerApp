@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:runner/Page/activity_history_page.dart';
+import 'package:runner/Page/leaderboard_page.dart';
 import 'package:runner/components/dashboard_components/google_maps_view.dart';
 import 'package:runner/components/dashboard_components/profile_page.dart';
 
@@ -21,6 +23,7 @@ class _DashboardPageState extends State<DashboardPage> {
   static List<Widget> _widgetOptions = <Widget>[
     ActivityHistoryPage(),
     GoogleMapsView(),
+    LeaderBoardPage(),
     UserProfile(),
   ];
 
@@ -34,23 +37,32 @@ class _DashboardPageState extends State<DashboardPage> {
         bottomNavigationBar: BottomNavigationBar(
           selectedLabelStyle: TextStyle(fontSize: 18, shadows: [
             Shadow(
-              color: Colors.red,
+              color: Colors.red.shade800,
               offset: Offset.infinite,
             ),
           ]),
-          backgroundColor: Colors.amber[50],
-          items: const <BottomNavigationBarItem>[
+          backgroundColor: Colors.black,
+          type: BottomNavigationBarType.shifting,
+          items: <BottomNavigationBarItem>[
             BottomNavigationBarItem(
+              backgroundColor: Colors.amber[100]?.withOpacity(0.85),
               icon: Icon(Icons.history),
               label: 'History',
             ),
             BottomNavigationBarItem(
+              backgroundColor: Colors.amber[100]?.withOpacity(0.85),
               icon: Icon(
                 Icons.run_circle_outlined,
               ),
               label: 'Run!',
             ),
             BottomNavigationBarItem(
+              backgroundColor: Colors.amber[100]?.withOpacity(0.85),
+              icon: Icon(MdiIcons.chartBar),
+              label: 'Profile',
+            ),
+            BottomNavigationBarItem(
+              backgroundColor: Colors.amber[100]?.withOpacity(0.85),
               icon: Icon(Icons.person),
               label: 'Profile',
             ),

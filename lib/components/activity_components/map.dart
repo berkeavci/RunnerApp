@@ -1,16 +1,14 @@
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:latlong/latlong.dart' as lt;
 import 'package:runner/activity_map_calculation/google_maps_controller.dart';
-import 'package:runner/activity_map_calculation/stat_calculations.dart';
 import 'package:runner/components/dashboard_components/google_maps_view.dart';
 
 class DrawMap extends StatefulWidget {
-  final LatLng initialPosition;
-  const DrawMap({Key? key, required this.initialPosition}) : super(key: key);
+  final List<LatLng> coordinates;
+  const DrawMap({Key? key, required this.coordinates}) : super(key: key);
 
   @override
   _DrawMapState createState() => _DrawMapState();
@@ -22,19 +20,16 @@ class _DrawMapState extends State<DrawMap> {
   bool isActivityStarted = true;
   bool isPaused = true;
   bool isMapPage = true;
-  bool isFirst = true;
   GoogleMapController? _controller;
   BitmapDescriptor? runnerIcon;
 
   Map<PolylineId, Polyline> polylines = {};
-  List<LatLng> polylineCoordinates = [];
-  PolylinePoints? polylinePoints;
-  String googleAPiKey = "AIzaSyD-UTPnkQA4F1OWfq8wFWDneLHdpOs2j3o";
+  // List<LatLng> polylineCoordinates = [];
+  // String googleAPiKey = "AIzaSyD-UTPnkQA4F1OWfq8wFWDneLHdpOs2j3o";
 
   @override
   void initState() {
     super.initState();
-    polylinePoints = PolylinePoints();
     _getPolyline();
   }
 
@@ -53,7 +48,7 @@ class _DrawMapState extends State<DrawMap> {
             GoogleMap(
               mapType: MapType.normal,
               initialCameraPosition:
-                  CameraPosition(target: widget.initialPosition, zoom: 17),
+                  CameraPosition(target: widget.coordinates[0], zoom: 17),
               onMapCreated: onMapCreated,
               markers:
                   createMarker(runnerIcon ?? BitmapDescriptor.defaultMarker),
@@ -71,7 +66,6 @@ class _DrawMapState extends State<DrawMap> {
                 child: FloatingActionButton(
                     onPressed: () {
                       Navigator.pop(context);
-                      polylineCoordinates.clear();
                       setState(() {
                         location.onLocationChanged.listen((event) {}).cancel();
                       });
@@ -92,6 +86,9 @@ class _DrawMapState extends State<DrawMap> {
 
   void onMapCreated(GoogleMapController controller) async {
     runnerIcon = await createMarkerImageFromAsset(context);
+    setState(() {
+      createMarker(runnerIcon ?? BitmapDescriptor.defaultMarker);
+    });
     _controller = controller;
     await location.changeSettings(interval: 1000, distanceFilter: 3);
     location.onLocationChanged.listen(
@@ -105,9 +102,8 @@ class _DrawMapState extends State<DrawMap> {
               ),
             ),
           );
-          if (isDistanceEnough()) {
-            createMarker(runnerIcon ?? BitmapDescriptor.defaultMarker);
-          }
+          // if (isDistanceEnough()) { /
+          createMarker(runnerIcon ?? BitmapDescriptor.defaultMarker);
           setLoc();
           _getPolyline();
           setState(() {});
@@ -127,69 +123,40 @@ class _DrawMapState extends State<DrawMap> {
             visible: true,
             polylineId: id,
             color: Colors.red.withOpacity(0.5),
-            points: polylineCoordinates);
+            points: widget.coordinates);
         polylines[id] = polyline;
       });
     }
   }
 
   Future<void> _getPolyline() async {
-    PolylineResult result;
-    if (isFirst) {
-      isFirst = false;
-      pointsLatLng.add(LatLng(
-          widget.initialPosition.latitude, widget.initialPosition.longitude));
-      pointsLatLng.add(LatLng(initialCameraposition?.latitude ?? 1,
-          initialCameraposition?.longitude ?? 1));
+    if (initialCameraposition == null) return;
+    var pos = initialCameraposition!;
+    widget.coordinates.add(LatLng(pos.latitude, pos.longitude));
 
-      result = await polylinePoints!.getRouteBetweenCoordinates(
-        googleAPiKey,
-        PointLatLng(pointsLatLng[0].latitude, pointsLatLng[0].longitude),
-        PointLatLng(pointsLatLng.last.latitude, pointsLatLng.last.longitude),
-        travelMode: TravelMode.walking,
-      );
-    } else {
-      result = await polylinePoints!.getRouteBetweenCoordinates(
-        googleAPiKey,
-        PointLatLng(
-            polylineCoordinates[polylineCoordinates.length - 1].latitude,
-            polylineCoordinates[polylineCoordinates.length - 1].longitude),
-        PointLatLng(initialCameraposition?.latitude ?? 1,
-            initialCameraposition?.longitude ?? 1),
-      );
-    }
-
-    if (result.status == 'OK') {
-      result.points.forEach((PointLatLng point) {
-        polylineCoordinates.add(LatLng(point.latitude, point.longitude));
-      });
-      print("Second Add");
-    } else {
-      print("Second Mistake");
-    }
     _addPolyLine();
   }
 
-  bool isDistanceEnough() {
-    Calculations method = new Calculations();
-    if (polylineCoordinates.length > 1) {
-      print(polylineCoordinates.toString());
-      double meter = method.getDistance(
-        new lt.LatLng(
-            initialCameraposition?.latitude, initialCameraposition?.longitude),
-        new lt.LatLng(polylineCoordinates.last.latitude,
-            polylineCoordinates.last.longitude),
-      );
-      print(polylineCoordinates[polylineCoordinates.length - 2].toString());
-      print(polylineCoordinates.last.toString());
-      if (meter > 5.0) {
-        print(meter);
-        return true;
-      } else {
-        return false;
-      }
-    } else {
-      return true;
-    }
-  }
+  // bool isDistanceEnough() {
+  //   Calculations method = new Calculations();
+  //   if (polylineCoordinates.length > 1) {
+  //     print(polylineCoordinates.toString());
+  //     double meter = method.getDistance(
+  //       new lt.LatLng(
+  //           initialCameraposition?.latitude, initialCameraposition?.longitude),
+  //       new lt.LatLng(polylineCoordinates.last.latitude,
+  //           polylineCoordinates.last.longitude),
+  //     );
+  //     print(polylineCoordinates[polylineCoordinates.length - 2].toString());
+  //     print(polylineCoordinates.last.toString());
+  //     if (meter > 5.0) {
+  //       print(meter);
+  //       return true;
+  //     } else {
+  //       return false;
+  //     }
+  //   } else {
+  //     return true;
+  //   }
+  // }
 }

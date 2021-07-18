@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:runner/activity_map_calculation/firebase_service.dart';
 
 class AuthenticationService {
   final FirebaseAuth _firebaseAuth;
@@ -11,7 +12,15 @@ class AuthenticationService {
       print("pas: " + password + "email: " + email);
       await _firebaseAuth.signInWithEmailAndPassword(
           email: email, password: password);
-      print(_firebaseAuth.currentUser?.uid);
+      // .then(
+      //   (value) => ApplicationState()
+      //       .addUsertoDatabase(value.user?.displayName)
+      //       .onError(
+      //         (error, stackTrace) => print(
+      //           error.toString(),
+      //         ),
+      //       ),
+      // );
       return 'Signed in';
     } on FirebaseAuthException catch (e) {
       return e.message;

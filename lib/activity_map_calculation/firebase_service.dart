@@ -7,16 +7,18 @@ import 'package:runner/entities/activity_stats.dart';
 import 'dart:core';
 
 import 'package:runner/entities/user.dart';
+import 'package:runner/entities/userLeaderboard.dart';
 
 class ApplicationState extends ChangeNotifier {
   var firebaseUser = FirebaseAuth.instance.currentUser;
-  StreamSubscription<QuerySnapshot>? _initialPositionSubs;
   CollectionReference locList =
       FirebaseFirestore.instance.collection('location');
   CollectionReference activityStats =
       FirebaseFirestore.instance.collection('ActivityStats');
   CollectionReference userCollection =
       FirebaseFirestore.instance.collection('User');
+  CollectionReference userLeaderboardCollection =
+      FirebaseFirestore.instance.collection('Leaderboard');
 
   Future<void> addActivitytoDatabase(
       LatLng initialCameraposition, String isActivity) {
@@ -58,8 +60,9 @@ class ApplicationState extends ChangeNotifier {
     }
   }
 
-  Future<void> addActivityStatstoDatabase(
-      double kcal, int step, double km, double averagespeed, String time) {
+  Future<void> addActivityStatstoDatabase(double kcal, int step, double km,
+      double averagespeed, String time, List<LatLng> totalPos) {
+    print("${totalPos.toString()}");
     return activityStats.add(
       {
         'userId': firebaseUser?.uid,
@@ -70,6 +73,7 @@ class ApplicationState extends ChangeNotifier {
         'time': time,
         'date': DateTime.now(),
         'timestamp': DateTime.now().millisecondsSinceEpoch,
+        'coordinates': ActivityStats.toList1(totalPos),
       },
     );
   }
@@ -92,15 +96,39 @@ class ApplicationState extends ChangeNotifier {
                     element["km"],
                     element["averagespeed"],
                     element["time"],
-                    ActivityStats.dateTimeFromTimestamp(element["date"]),
+                    ActivityStats.dateTimeFromTimestamp(
+                      element["date"],
+                    ),
+                    ActivityStats.dynamictoStringList(element["coordinates"]),
                   ),
                 );
               },
             ),
           );
+      print(ActivityStats.stringtoLatLng(activityS[0].map["coordinate"]));
       return activityS;
     } catch (e) {
       print(e.toString());
+    }
+  }
+
+  Future<List<UserLeaderboard>?> fetchUserLeaderboard() async {
+    List<UserLeaderboard>? userL = <UserLeaderboard>[];
+    // UserLeaderboard.intToDouble(element["totalDistancebyKm"])
+    try {
+      await userLeaderboardCollection
+          .orderBy("totalDistancebyKm", descending: true)
+          .get()
+          .then(
+            (value) => value.docs.forEach((element) {
+              userL.add(new UserLeaderboard(element["userId"], element["name"],
+                  element["totalDistancebyKm"]));
+            }),
+          )
+          .onError((error, stackTrace) => print("${error.toString()}"));
+      return userL;
+    } catch (e) {
+      print("${e.toString()}");
     }
   }
 
@@ -108,10 +136,21 @@ class ApplicationState extends ChangeNotifier {
     return userCollection.add(
       {
         'userId': firebaseUser?.uid,
-        'name': firebaseUser?.displayName ?? name,
+        'name': name,
         'email': firebaseUser?.email,
         'about': "",
         'weight': 70,
+      },
+    );
+  }
+
+  Future<void> addUserLeaderboardInfo(String? name) {
+    double distance = 0.0;
+    return userLeaderboardCollection.add(
+      {
+        'userId': firebaseUser?.uid,
+        'name': name,
+        'totalDistancebyKm': distance,
       },
     );
   }
@@ -139,6 +178,38 @@ class ApplicationState extends ChangeNotifier {
     } catch (e) {
       print(e.toString());
     }
+  }
+
+  Future<void> updateUserInfo(
+      String name, String weight, String aboutMe) async {
+    int userWeight = int.tryParse(weight) ?? 70;
+    List<QueryDocumentSnapshot<Object?>> userDoc = [];
+    await userCollection
+        .where("userId", isEqualTo: firebaseUser?.uid)
+        .get()
+        .then((value) {
+      userDoc = value.docs.toList();
+    });
+    userCollection.doc(userDoc.first.id).update({
+      'name': name,
+      'weight': userWeight,
+      'about': aboutMe,
+    }).onError((error, stackTrace) => print("${error.toString()}"));
+  }
+
+  Future<void> updateLeaderboard(double dist) async {
+    List<QueryDocumentSnapshot<Object?>> userLeaderboardDoc = [];
+    await userLeaderboardCollection
+        .where("userId", isEqualTo: firebaseUser?.uid)
+        .get()
+        .then((value) {
+      dist += (value.docs.first.data() as Map)["totalDistancebyKm"];
+      userLeaderboardDoc = value.docs.toList();
+      print(userLeaderboardDoc[0].id);
+    });
+    userLeaderboardCollection.doc(userLeaderboardDoc[0].id).update({
+      'totalDistancebyKm': dist,
+    }).onError((error, stackTrace) => print("${error.toString()}"));
   }
 }
 

@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -26,15 +25,15 @@ class _UserProfileState extends State<UserProfile> {
 
   UserInformations? userInformation;
 
-  _UserProfileState() {
-    ApplicationState().fetchUserInformation().then((value) => setState(() {
-          userInformation = value;
-        }));
-  }
-
   @override
   void initState() {
     super.initState();
+    if (mounted) {
+      ApplicationState().fetchUserInformation().then((value) => setState(() {
+            userInformation = value;
+            print(value?.map["email"]);
+          }));
+    }
   }
 
   var icon = CupertinoIcons.moon_stars;

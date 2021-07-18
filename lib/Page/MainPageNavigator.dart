@@ -20,7 +20,6 @@ class _MainPageNavigator extends State<MainPageNavigator> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Container(
               child: CircularProgressIndicator(
-                // TODO: Not Working
                 color: Colors.blue,
                 valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
               ),

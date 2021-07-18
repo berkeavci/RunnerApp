@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:runner/Page/details_page.dart';
-import 'package:runner/Page/share_test.dart';
 import 'package:runner/activity_map_calculation/firebase_service.dart';
 import 'package:runner/constans.dart';
 import 'package:runner/entities/activity_stats.dart';

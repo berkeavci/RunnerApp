@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -180,23 +181,36 @@ class _CreateanAccountButtonState extends State<CreateanAccountButton> {
               .then((value) {
             if (value == 'Signed Up') {
               ApplicationState().addUsertoDatabase(widget.nameController.text);
-              Navigator.pop(context);
+              ApplicationState()
+                  .addUserLeaderboardInfo(widget.nameController.text);
+              if (mounted) {
+                ScaffoldMessenger.of(context)
+                  ..removeCurrentSnackBar()
+                  ..showSnackBar(
+                    SnackBar(
+                      content: Text('Successfull Sign Up! Go Login'),
+                    ),
+                  );
+              }
+              Navigator.pop(context, widget.nameController.text);
             } else {
-              ScaffoldMessenger.of(context)
-                ..removeCurrentSnackBar()
-                ..showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      '${value.toString()}',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.red,
-                        fontFamily: productSans,
-                        fontWeight: FontWeight.w900,
+              if (mounted) {
+                ScaffoldMessenger.of(context)
+                  ..removeCurrentSnackBar()
+                  ..showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        '${value.toString()}',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontFamily: productSans,
+                          fontWeight: FontWeight.w900,
+                        ),
                       ),
                     ),
-                  ),
-                );
+                  );
+              }
             }
           });
         },

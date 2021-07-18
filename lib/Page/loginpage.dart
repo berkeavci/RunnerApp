@@ -1,4 +1,4 @@
-import 'dart:developer';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:runner/LoginStates/google_signIn.dart';
@@ -6,8 +6,10 @@ import 'package:provider/provider.dart';
 import 'package:runner/LoginStates/sign_in_withoutGoogle.dart';
 import 'package:flutter/foundation.dart';
 import 'package:runner/Page/create_account_page.dart';
+import 'package:runner/activity_map_calculation/firebase_service.dart';
 import 'package:runner/components/loginpage/inputEmail_TF.dart';
 import 'package:runner/components/loginpage/inputPassword_TF.dart';
+import 'package:runner/entities/user.dart';
 
 import '../constans.dart';
 
@@ -48,27 +50,33 @@ Widget _buildSignInButton(
         providerR
             .signIn(
                 email: emailController.text, password: passwordController.text)
-            .then(
-          (value) {
-            if (value != 'Signed Up') {
-              ScaffoldMessenger.of(ct)
-                ..removeCurrentSnackBar()
-                ..showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      '${value.toString()}',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.red,
-                        fontFamily: productSans,
-                        fontWeight: FontWeight.w900,
-                      ),
+            .then((value) {
+          if (value != 'Signed Up') {
+            // ApplicationState().fetchUserInformation().then((value) {
+            //   ApplicationState()
+            //       .addUserLeaderboardInfo(value?.name)
+            //       .onError((error, stackTrace) => print("${error.toString()}"));
+            //   print(value?.name);
+            // });
+
+            // TODO: deal w/mounted
+            ScaffoldMessenger.of(ct)
+              ..removeCurrentSnackBar()
+              ..showSnackBar(
+                SnackBar(
+                  content: Text(
+                    '${value.toString()}',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontFamily: productSans,
+                      fontWeight: FontWeight.w900,
                     ),
                   ),
-                );
-            }
-          },
-        );
+                ),
+              );
+          }
+        });
       },
       label: Text(
         "Login",
@@ -105,6 +113,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  String? name;
 
   @override
   Widget build(BuildContext context) {

@@ -27,6 +27,7 @@ Widget _buildLoginBtn(BuildContext ct) {
       onPressed: () {
         var provider = Provider.of<GoogleSignInProvider>(ct, listen: false);
         provider.googleLogin(); // Through provider, we call googleLogin()
+        //print("object")
       },
     ),
   );

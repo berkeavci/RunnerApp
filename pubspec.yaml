@@ -30,6 +30,7 @@ dependencies:
   firebase_auth: ^1.4.1 
 
   provider: ^5.0.0
+  sqflite: ^2.0.0+3
 
   #View based 
   font_awesome_flutter: ^9.1.0

@@ -35,6 +35,7 @@ class _DashboardPageState extends State<DashboardPage> {
           child: _widgetOptions.elementAt(_selectedIndex),
         ),
         bottomNavigationBar: BottomNavigationBar(
+          //TODO: Curved Navigation Bar implement
           selectedLabelStyle: TextStyle(fontSize: 18, shadows: [
             Shadow(
               color: Colors.red.shade800,

@@ -25,7 +25,6 @@ class _DrawMapState extends State<DrawMap> {
 
   Map<PolylineId, Polyline> polylines = {};
   // List<LatLng> polylineCoordinates = [];
-  // String googleAPiKey = "AIzaSyD-UTPnkQA4F1OWfq8wFWDneLHdpOs2j3o";
 
   @override
   void initState() {

@@ -24,3 +24,10 @@ There are login options; Login via Gmail, login via existed account in the app d
 
 # Dashboard Page:
 - Dashboard Page seperated into three area; **Home**, **Run**, **Profile**   
+
+#TODO 
+
+-[ ] Update Marker. <br/>
+-[ ] Implementation of Sqflite. <br/>
+-[ ] Leaderboard implementation. <br/>
+-[ ] Fix marker on details google map. <br/>    

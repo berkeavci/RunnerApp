@@ -188,7 +188,7 @@ class _CreateanAccountButtonState extends State<CreateanAccountButton> {
                   ..removeCurrentSnackBar()
                   ..showSnackBar(
                     SnackBar(
-                      content: Text('Successfull Sign Up! Go Login'),
+                      content: Text('Successfull Sign Up!'),
                     ),
                   );
               }

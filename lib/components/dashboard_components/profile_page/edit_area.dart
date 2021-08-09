@@ -34,11 +34,12 @@ class _EditProfileState extends State<EditProfile> {
             color: Colors.black,
           ),
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.pop(context, 'Data Changed');
           },
         ),
         actions: [
-          saveIcon(context, nameController, weightController, aboutController),
+          saveIcon(context, nameController, weightController, aboutController,
+              widget.userInfo),
         ],
         title: Text(
           'Edit Profile',
@@ -56,7 +57,8 @@ class _EditProfileState extends State<EditProfile> {
               weightController,
               aboutController,
               widget.userInfo?.name ?? "",
-              widget.userInfo?.weight.toString() ?? "70",
+              widget.userInfo?.weight.toString() ??
+                  "70", // TODO: Re-update - DONE
               widget.userInfo?.about ?? ""),
         ],
       ),
@@ -64,15 +66,18 @@ class _EditProfileState extends State<EditProfile> {
   }
 }
 
-Widget saveIcon(BuildContext context, TextEditingController name,
-    TextEditingController weight, TextEditingController aboutme) {
+Widget saveIcon(
+    BuildContext context,
+    TextEditingController name,
+    TextEditingController weight,
+    TextEditingController aboutme,
+    UserInformations? userInfo) {
   return IconButton(
     icon: Icon(
       CupertinoIcons.cloud_download,
       color: Colors.black,
     ),
     onPressed: () {
-      print(weight);
       ApplicationState()
           .updateUserInfo(name.text, weight.text, aboutme.text)
           .onError(

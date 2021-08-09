@@ -93,11 +93,56 @@ class _UserProfileState extends State<UserProfile> {
             SizedBox(
               height: 30,
             ),
-            aboutMe(context),
+            aboutMe(context, userInformation?.about),
           ],
         ),
       ),
     );
+  }
+
+  Widget buttonWidget(BuildContext ct, UserInformations? ui) => Column(
+        children: [
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              primary: Colors.red.shade300,
+              elevation: 1,
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  "Edit Profile",
+                  style: TextStyle(color: Colors.black),
+                ),
+                SizedBox(
+                  width: 10,
+                ),
+                Icon(CupertinoIcons.arrow_up_right_circle),
+              ],
+            ),
+            onPressed: () {
+              // Navigator.push(
+              //   ct,
+              //   MaterialPageRoute(
+              //       builder: (context) => EditProfile(userInfo: ui)),
+              // );
+              dataChangeCheck(ct, ui);
+            },
+          ),
+        ],
+      );
+
+  dataChangeCheck(BuildContext context, UserInformations? ui) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => EditProfile(userInfo: ui)),
+    );
+    if (result == 'Data Changed') {
+      ApplicationState().fetchUserInformation().then((value) => setState(() {
+            userInformation = value;
+            print(value?.map["email"]);
+          }));
+    }
   }
 }
 
@@ -121,40 +166,10 @@ Widget informationArea(UserInformations? uI) => Column(
     );
 
 // Edit Button
-Widget buttonWidget(BuildContext ct, UserInformations? ui) => Column(
-      children: [
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            primary: Colors.red.shade300,
-            elevation: 1,
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                "Edit Profile",
-                style: TextStyle(color: Colors.black),
-              ),
-              SizedBox(
-                width: 10,
-              ),
-              Icon(CupertinoIcons.arrow_up_right_circle),
-            ],
-          ),
-          onPressed: () {
-            Navigator.push(
-              ct,
-              MaterialPageRoute(
-                  builder: (context) => EditProfile(userInfo: ui)),
-            );
-          },
-        ),
-      ],
-    );
 
 // About Me Area
 // TODO: Scrollable TextField()
-Widget aboutMe(BuildContext ct) => Container(
+Widget aboutMe(BuildContext ct, String? aboutme) => Container(
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 10),
         child: Column(
@@ -167,7 +182,7 @@ Widget aboutMe(BuildContext ct) => Container(
             SizedBox(
               height: 10,
             ),
-            Text(''), // -> User aboutme Data // Fetch from sqllite
+            Text(aboutme ?? ""), // -> User aboutme Data // Fetch from sqllite
           ],
         ),
       ),
